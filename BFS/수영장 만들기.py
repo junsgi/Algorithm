@@ -4,11 +4,6 @@ input = sys.stdin.readline
 n, m = map(int, input().strip().split())
 pool = []
 """
-방문 배열 요소 의미
-    0 : 물
-    -1 : 방문
-    1 : 벽
-
 1. 입력으로 주어진 수영장을 실제 3차원 배열로 구현
 2. 1층부터 9층까지 벽이 아니라면 큐에 삽입
 3. 방문 배열의 물의 개수를 구함
@@ -41,12 +36,12 @@ def BFS():
             if not (0 <= tx <= n + 1 and 0 <= ty <= m + 1 and 1 <= tz <= limit): continue
             if visit[tz][tx][ty]:
                 continue
-            visit[tz][tx][ty] = -1
+            visit[tz][tx][ty] = 1
             que.append((tx, ty, tz))
         
 BFS()
 ans = 0
-# 물의 개수를 구합니다.
+# 물의 개수(0)를 구합니다.
 for w in range(1, limit + 1):
     for i in visit[w]:
         ans += i.count(0)
