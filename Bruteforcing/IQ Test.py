@@ -1,4 +1,5 @@
 """
+https://www.acmicpc.net/problem/1111
 브루트포트 문제이기도 하지면 수학 문제 풀듯 풀었다.
 
 1. 길이가 1
