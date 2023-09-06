@@ -23,13 +23,9 @@ for i in range(n):
         if cnt[day] == day: continue
 
         for j in range(day - 1, 0 , -1):
-            # 일찍 부르지만 페이는 낮은경우
+            # 일찍 부르지만 페이는 낮은경우 or j날에 강의가 비어있는 경우 (check[j]가 0일 때) 채워 넣음
             if check[j] < pay:
                 check[j] = pay
                 cnt[day] += 1
-                break
-            # j날짜가 비어있는 경우
-            if not check[j]:
-                check[j] = pay
                 break
 print(sum(check))
