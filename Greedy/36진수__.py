@@ -1,44 +1,38 @@
 # https://www.acmicpc.net/problem/1036
-alpha = { chr(x) : int(chr(x), 36) for x in range(65, 91) }
-for i in range(10): alpha[str(i)] = i
-check = [[0] * 51 for i in range(37)]
+alpha = { int(chr(x), 36) : chr(x)  for x in range(65, 91) }
+for i in range(10): 
+    alpha[i] = i
+print(alpha)
+
+MAX = [0] * 37
 n = int(input())
 words = [input() for _ in range(n)]
 k = int(input())
+a = {}
 
 for w in words:
-    zero = len(w) - 1
-    for i in w:
-        check[alpha[i]][zero] += 1
-        zero -= 1
-
-
-def Sum(n, m):
-    bit = 0
-    n, m = sorted((n, m), key = lambda x : len(x))
-    n = "0" * (len(m) - len(n)) + n
-    idx = len(n) - 1
-    result = ""
-    
-    while idx >= 0:
-        tn = int(n[idx])
-        tm = int(m[idx])
-        s = tn + tm
-        if s > 9:
-            if not bit:
-                result += str(s % 10)
-            else:
-                result += str(s % 10 + 1)
-            bit = 1
+    tnum = 1
+    for j in range(len(w) - 1, -1, -1):
+        if w[j] in a:
+            a[w[j]] += int(w[j], 36) * tnum
         else:
-            if not bit:
-                result += str(s)
-            else:
-                if s + 1 > 9:
-                    result += str((s + 1) % 10)
-                    bit = 1
-                else:
-                    result += str(s + 1)
-                    bit = 0
-        idx -= 1
-    return result[::-1] if not bit else "1" + result[::-1]
+            a[w[j]] = int(w[j], 36) * tnum
+        if w[j] != 'Z':
+            MAX[int(w[j], 36)] += 35 * tnum
+        tnum *= 10
+        
+MAX.sort(reverse=True)
+a = sorted(a.values(), reverse = True)
+ans = 0
+for i in range(len(a)):
+    if k:
+       ans += MAX[i]
+       k -= 1
+    else:
+        ans += a[i]
+print(MAX[:len(a)])
+print(a)
+print(ans)
+while ans :
+    print(alpha[ans % 36])
+    ans //= 36
