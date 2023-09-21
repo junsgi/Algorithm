@@ -5,20 +5,24 @@ import heapq
 input = sys.stdin.readline
 
 n, m, oil = map(int, input().split())
-end = 0
 graph = [[0] * (n + 1)]
 for i in range(1, n + 1):
     graph.append(list(map(int, input().split())))
     graph[i].insert(0, 0)
-checkNumber = 1
 visit = [[0] * (n + 1) for _ in range(n + 1)]
 
-
 taxiX, taxiY = map(int, input().split())
-customer = []
+START = [[0] * (n + 1) for _ in range(n)]
+
+ctm = {}
 for i in range(m):
-    customer.append(list(map(int, input().split())))
-heap = []
+    customer = list(map(int, input().split()))
+    START[customer[0]][customer[1]] = i + 2
+    ctm[f'{customer[0]} {customer[1]}'] = (customer[2], customer[3])
+
+checkNumber = 1 # 탐색할 때마다 방문배열을 초기화하지 않고 특정 숫자를 참고하여 중복 방문을 막음
+end = 0 # 손님을 목적지에 도착할 때마다 1씩 증가
+heap = [] 
 que = deque()
 dire = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
@@ -29,15 +33,13 @@ def searchBFS(x, y, oil):
     que.append((x, y, oil, 0))
     visit[x][y] = checkNumber
     limit = 0x7fffffff
+
     while que:
         tx, ty, to, depth  = que.popleft()
-
-        for idx in range(len(customer)):
-            # 손님을 만나면
-            if tx == customer[idx][0] and ty == customer[idx][1]:
-                # 현재 거리보다 더 탐색하지 못하게 limit을 검
-                limit = min(limit, depth)
-                heapq.heappush(heap, (depth, tx, ty, to, customer[idx]))
+        key = f'{tx} {ty}'
+        if key in ctm: # 손님을 만났다면
+            limit = min(limit, depth) # 깊이 제한
+            heapq.heappush(heap, (depth, tx, ty, to, ctm[key], key))
 
         for a, b in dire:
             ax, ay = tx + a, ty + b
@@ -57,8 +59,10 @@ def searchBFS(x, y, oil):
     if heap:
         end += 1
         checkNumber += 1
-        return heapq.heappop(heap)
-    else:
+        value = heapq.heappop(heap)
+        ctm.pop(value[-1])
+        return value
+    else: # 손님을 만난적 없지만 모두 데려다 줬으면 답 출력 후 종료
         if end == m:
             print(oil)
         else:
@@ -67,21 +71,23 @@ def searchBFS(x, y, oil):
         
 
 
-def DRIVE(x, y, oil):
+def DRIVE(x, y, oil, targetX, targetY):
     global n, checkNumber, taxiX, taxiY
     que.clear()
-    target = START[x][y]
     START[x][y] = 0
     que.append((x, y, oil, 0))
     visit[x][y] = checkNumber
 
     while que:
         ax, ay, ao, adis = que.popleft()
-        if END[ax][ay] == target:
-            END[ax][ay] = 0
+
+        # 목표에 도착
+        if ax == targetX and ay == targetY:
+            # 택시 위치 수정
             taxiX, taxiY = ax, ay
             # 현재 오일에 주행거리의 2배가 충전된다.
             return adis * 2 + ao
+        
         for a, b in dire:
             tx, ty = ax + a, ay + b
             if not ( 1 <= tx <= n and 1 <= ty <= n): continue
@@ -94,9 +100,8 @@ def DRIVE(x, y, oil):
 
 while True:
     value = searchBFS(taxiX, taxiY, oil)
-    oil = DRIVE(x, y, o)
-    if oil == -1:
+    oil = DRIVE(*(value[1:4]), *(value[-2]))
+    if oil == -1: # 주행 중 기름이 떨어져 더이상 이동할 수 없다면
         print(oil)
         break
     checkNumber += 1
-
