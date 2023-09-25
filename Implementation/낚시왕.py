@@ -5,7 +5,18 @@ dire = [0, [-1, 0], [1, 0], [0, 1], [0, -1]]
 dire2 = [0, -1, 1, 1, -1]
 ans = 0
 def MOVE(sharks):
-    pass
+    for row, col, speed, direction, size in sharks:
+        tr, tc = row + (direction[0] * speed), col + (direction[1] * speed)
+
+        # 동쪽이나 서쪽을 바라본다면
+        if direction[0] == 0:
+            pass
+        else:
+            # 북쪽이나 남쪽을 바라본다면
+            pass
+
+
+
 
 def EAT(sharks):
     pass
@@ -21,7 +32,7 @@ graph = [[0] * (M + 1) for _ in range(N + 1)]
 sharks = []
 for _ in range(S):
     r, c, s, d, z = map(int, input().split())
-    sharks.append((r, c, s, d, z, dire2[d]))
+    sharks.append((r, c, s, dire[d], z))
 
 for i in range(1, M + 1):
     # 낚시왕이 오른쪽으로 한 칸 이동한다.
