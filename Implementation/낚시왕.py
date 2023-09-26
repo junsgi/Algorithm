@@ -12,7 +12,8 @@ dire = [0, [-1, 0], [1, 0], [0, 1], [0, -1]]
 chain = [0, 2, 1, 4, 3]
 getCost = [0, 1, N,  M, 1]
 move = [0, N - 1, N - 1, M - 1, M - 1]
-end = [0, [N, None], [1, None], [None, 1], [None, M]]
+end = [0, [1, None], [N, None], [None, M], [None, 1]]
+plusminus = [0, 1, -1, -1, 1]
 ans = 0
 
 def MOVE(sharks):
@@ -22,54 +23,63 @@ def MOVE(sharks):
         cost = abs((row if d == 1 or d == 2 else col) - getCost[d])
 
         if speed <= cost:
-            sharks[i][0] = row + speed * dire[d][0]
-            sharks[i][1] = col + speed * dire[d][1]
+            sharks[i][0] = row + (speed * dire[d][0])
+            sharks[i][1] = col + (speed * dire[d][1])
         else:
-            speed -= cost
-            d = chain[d]
-            pm = -pm
-            ck = speed // move[d]
+            # 끝 도착
             sharks[i][0] = end[d][0] if end[d][0] else row
             sharks[i][1] = end[d][1] if end[d][1] else col
+            speed -= cost
+            
+            # 방향 전환
+            pm = plusminus[d]
+            d = chain[d]
 
+            # 홀수면 반대끝, 짝수면 현재위치
+            ck = speed // move[d]
             if ck % 2 == 0:
                 sharks[i][0] += ((speed % move[d]) * dire[d][0]) 
                 sharks[i][1] += ((speed % move[d]) * dire[d][1])
             else:
-                sharks[i][0] = end[chain[d]][0] if end[chain[d]][0] else row
-                sharks[i][1] = end[chain[d]][1] if end[chain[d]][1] else col
-                pm = -pm
-                sharks[i][0] += ((speed % move[d]) * dire[d][0]) * pm
-                sharks[i][1] += ((speed % move[d]) * dire[d][1]) * pm
+                sharks[i][0] = end[d][0] if end[d][0] else row
+                sharks[i][1] = end[d][1] if end[d][1] else col
+                speed -= move[d]
+
+                pm = plusminus[d]
+                d = chain[d]
+                sharks[i][0] += ((speed % move[d]) * dire[d][0])
+                sharks[i][1] += ((speed % move[d]) * dire[d][1])
 
         
         if d == 1 and sharks[i][0] == 1:
+            pm = plusminus[d]
             d = chain[d]
         if d == 2 and sharks[i][0] == N:
+            pm = plusminus[d]
             d = chain[d]
         if d == 3 and sharks[i][1] == M:
+            pm = plusminus[d]
             d = chain[d]
         if d == 4 and sharks[i][1] == 1:
+            pm = plusminus[d]
             d = chain[d]
+
         sharks[i][5] = pm
         sharks[i][3] = d
 
 
-def EAT(sharks):
+def EAT():
     sharks.sort(key = lambda x : (x[0], x[1], -x[4]))
     result = []
-    maxidx = -1
-    for i in range(len(sharks) - 1):
-        print(*sharks[i])
-        
+    mx = sharks[0][0]
+    my = sharks[0][1]
+    for i in range(1, len(sharks) - 1):
+        if mx == sharks[i][0] and my == sharks[i][1]:
+            result.append(i)
+        else:
+            mx, my = sharks[i][0], sharks[i][1]
 
-
-"""
-r, c : 상어 위치
-s : 속력 (탐색 깊이)
-d : 이동방향
-z : 크기 (위치가 겹친다면 가장 큰 상어가 나머지 다 잡아먹음)
-"""
+    return result
 
 for i in range(1, M + 1):
     # 낚시왕이 오른쪽으로 한 칸 이동한다.
@@ -84,14 +94,19 @@ for i in range(1, M + 1):
                 idx = j
     if idx != -1:
         ans += sharks[idx][4]
+        #print(sharks[idx])
         del sharks[idx]
 
 
     # 상어가 이동한다.
     # 모든 상어가 속력 만큼 이동
     MOVE(sharks)
-    print(sharks)
 
     # 좌표가 겹친다면 크기가 큰 상어를 제외하고 모두 잡아먹는다.
-    EAT(sharks)
+    if sharks:
+        idxs = EAT()
+        for idx in idxs:
+            sharks[idx] = None
+        while None in sharks:
+            del sharks[sharks.index(None)]
 print(ans)
