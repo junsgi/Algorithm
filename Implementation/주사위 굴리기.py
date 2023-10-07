@@ -2,3 +2,6 @@
 N, M, dx, dy, com = map(int, input().split())
 grp = [list(map(int, input().split())) for _ in range(N)]
 com = list(map(int, input().split()))
+dice = [0, 0, 0, 0, 0, 0] # 윗 
+
+mv = [0, []]
