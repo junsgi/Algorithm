@@ -10,7 +10,7 @@ for _ in range(n):
 arr.sort(key = lambda x : x[0])
 
 for i in range(n):
-    st, ed = arr[i]
+    st, ed = arr[i]#
     if not heap: 
         heapq.heappush(heap, ed)
         answer += 1
