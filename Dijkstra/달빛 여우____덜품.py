@@ -9,8 +9,8 @@ for _ in range(m):
     graph[s].append([e, c])
     graph[e].append([s, c])
 
-wolf = [[float("inf")] * (n + 1) for _ in range(2)]
-fox = [float("inf")] * (n + 1)
+wolf = [[0x7fffffff] * (n + 1) for _ in range(2)]
+fox = [0x7fffffff] * (n + 1)
 fox[1] = wolf[1][1] = 0
 heap = []
 heappush(heap, (0, -1, 1))
@@ -34,6 +34,6 @@ while heap:
             heappush(heap, (cost + tc * 2, 1, nx))
 ans = 0
 for i in range(1, n + 1):
-    if fox[i] < min(wolf[1][i], wolf[0][i]):
+    if fox[i] < wolf[1][i] and fox[i] < wolf[0][i]:
         ans += 1
 print(ans)
