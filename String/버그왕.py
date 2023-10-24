@@ -6,7 +6,7 @@ for i in sys.stdin:
     if not syn:
         print()
         continue
-    check = re.search("[BUG]+", syn)
+    check = re.search("(BUG)+", syn)
     while syn and check:
         x, y = check.span()
         syn = syn[:x] + syn[y:]
