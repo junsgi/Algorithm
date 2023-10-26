@@ -7,6 +7,7 @@ for i in range(1, 25):
         ans += W
         cur += T
     else:
-        if cur - H < 0 : break
         cur -= H
+        if cur - H < 0 :
+            cur = 0
 print(ans)
