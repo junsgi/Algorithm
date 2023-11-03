@@ -2,40 +2,29 @@
 from heapq import heappush, heappop
 import sys
 input = sys.stdin.readline
-def get(cnt):
-    result = []
-    for _ in range(cnt):
-        num = heappop(heap)
-        result.append(num)
-    n = result[-1]
-    while result:
-        heappush(heap, result.pop())
-    return n
-heap = []
-
 n = int(input())
-x = int(input())
-print(x)
-heappush(heap, x)
-for _ in range(n - 1):
+MAX = []
+MIN = []
+mid = int(input())
+print(mid)
+for i in range(n - 1):
     x = int(input())
-    heappush(heap, x)
-    if len(heap) % 2:
-        print(get(len(heap) // 2 + 1))
-    else:
-        print(get(len(heap) // 2))
+
+    t1, t2 = max(mid, x), min(mid, x)
+    # 입력 값 + 중앙 값 + 두 힙 크기가 홀수라면
+    if len(MAX) == len(MIN):
+        heappush(MIN, t1)
+        heappush(MAX, -t2)
+        mid = -heappop(MAX)
+    else: # 입력 값 + 중앙 값 + 두 힙 크기가 홀수라면
+
+        # 최소힙의 길이가 더 짧다면
+        if len(MAX) < len(MIN): 
+            if mid <= x:
+                heappush(MIN, t2)
+            else:
+                pass
+        else:pass
 
 
-"""
-left, mid, right
-1
-1, 0, 0
-
-5
-1, 5, 0
-1, 2, 5
-1, 2, 10
--99, 2, 10
-
-
-"""
+    print(mid)
