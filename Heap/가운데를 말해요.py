@@ -11,20 +11,15 @@ for i in range(n - 1):
     x = int(input())
 
     t1, t2 = max(mid, x), min(mid, x)
-    # 입력 값 + 중앙 값 + 두 힙 크기가 홀수라면
-    if len(MAX) == len(MIN):
+    if len(MAX) != len(MIN):
+        heappush(MIN, t1)
+        heappush(MAX, -t2)
+        if len(MAX) > len(MIN):
+            mid = -heappop(MAX)
+        else:
+            mid = heappop(MIN)
+    else:
         heappush(MIN, t1)
         heappush(MAX, -t2)
         mid = -heappop(MAX)
-    else: # 입력 값 + 중앙 값 + 두 힙 크기가 홀수라면
-
-        # 최소힙의 길이가 더 짧다면
-        if len(MAX) < len(MIN): 
-            if mid <= x:
-                heappush(MIN, t2)
-            else:
-                pass
-        else:pass
-
-
     print(mid)
