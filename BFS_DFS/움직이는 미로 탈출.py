@@ -9,45 +9,42 @@ def BFS():
     visit[0][7][0] = 1
     dire = [[0, 0], [-1, 0], [1, 0], [0, 1], [0, -1], [-1, -1], [-1, 1], [1, -1], [1, 1]]
     while que:
-        x, y, cnt = que.popleft()
-        if x == 0 and y == 7:
-            return 1
+        x, y, depth = que.popleft()
+
         for a, b in dire:
             tx, ty = x + a, y + b
-            if not (0 <= tx < 8 and 0 <= ty < 8 and cnt + 1 <= 8): continue
-            if visit[cnt + 1][tx][ty] or visit[cnt][x][y] + 1 >= check[cnt + 1][tx][ty]: continue
-            visit[cnt + 1][tx][ty] = visit[cnt][x][y] + 1
-            que.append((tx, ty, cnt + 1))
+            if not (0 <= tx < 8 and 0 <= ty < 8): continue
+
+            # 벽이 있는 곳으로 갈 수 없으므로 continue
+            if visit[depth][tx][ty] == 2: continue
+
+            if depth + 1 < 8:
+                # 다음 위치에서 벽이랑 부딪히면 continue
+                if visit[depth + 1][tx][ty] == 2: continue
+                visit[depth + 1][tx][ty] = 1
+                que.append((tx, ty, depth + 1))
+            else:
+                # 0행에 있던 벽이 모두 사라졌다면 단순 방문 체크용으로 사용
+                if visit[depth][tx][ty]: continue
+                visit[depth][tx][ty] = 1
+                que.append((tx, ty, depth))
+            
+            if tx == 0 and ty == 7: # 다음 위치가 도착지라면 바로 종료
+                return 1
     return 0
-def DRAW(x, y):
-    c = 0
-    for i in range(8):
-        c = i
-        for j in range(x + i, 8):
-            check[i][j][y] = check[j][i][y] = c
-            c += 1
+
+def DRAW(x, y): # 깊이마다 벽 위치 기록
+    for i in range(x, 8):
+        visit[i - x][i][y] = 2
+
 graph = []
-MAX = 0x7fffffff
-visit = [[[0] * 8 for _ in range(8)] for _ in range(9)]
-check = [[[MAX] * 8 for _ in range(8)] for _ in range(9)]
+visit = [[[0] * 8 for _ in range(8)] for _ in range(8)]
+
+# 입력
 for i in range(8):
     graph.append(list(input().strip()))
     for j in range(8):
         if graph[i][j] == '#':
             DRAW(i, j)
-for i in check:
-    for j in i:
-        for k in j:
-            print(f"{k:11d}", end = '')
-        print()
-    print()
 
-print("\nvisit\n")
-n = BFS()
-for i in visit:
-    for j in i:
-        for k in j:
-            print(f"{k:3d}", end = '')
-        print()
-    print()
-print(n)
+print(BFS())
