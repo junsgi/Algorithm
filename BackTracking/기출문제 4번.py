@@ -1,108 +1,139 @@
-# 1 -> 3
-# 2 -> 4
-# 5 벽, 0 빈칸
-
+# https://school.programmers.co.kr/learn/courses/19344/lessons/242261
+from collections import deque
 dire = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-answer = 2 ** 31
+def CHECK(a, b, g):
+    return not (0 <= a < len(g) and 0 <= b < len(g[0])) 
 
-def BACK(graph, rx, ry, bx, by, visit, depth, S, B):
+def BFS(graph, visit, RB):
     global answer
-    # 옮기고 보니 부딪혔다면
-    if rx == bx and ry == by : return
+    que = deque()
+    RB.extend([0, False, False])
+    que.append(RB)
+    visit[RB[0]][RB[1]][RB[2]][RB[3]] = 1
+    visit[RB[2]][RB[3]][RB[0]][RB[1]] = 1
+    
+    while que:
+        rx, ry, bx, by, depth, R, B = que.popleft()
+        
+        if R and B:
+            return depth
+        # 빨간거 부터 옮기는 코드
+        for i in range(4):
+            Rx, Ry = rx + dire[i][0], ry + dire[i][1]
+            if R:
+                Rx, Ry = rx, ry
+            if CHECK(Rx, Ry, graph) : continue
+            if Rx == bx and Ry == by: continue
+            if graph[Rx][Ry] == 5 : continue
+            
+            for j in range(4):
+                Bx, By = bx + dire[j][0], by + dire[j][1]
+                if B:
+                    Bx, By = bx, by
+                if CHECK(Bx, By, graph) : continue
+                if visit[Rx][Ry][Bx][By]: continue
+                if Bx == Rx and By == Ry: continue
+                if graph[Bx][By] == 5 : continue
+                visit[Rx][Ry][Bx][By] = 1
+                que.append([Rx, Ry, Bx, By, depth + 1, graph[Rx][Ry] == 3, graph[Bx][By] == 4])
+                
 
-    # 백트래킹
-    if answer <= depth:
-        return
-    
-    # 도착하면 
-    if S and B:
-        answer = depth
-        return
-    
-    for i in range(4):
-        Rx, Ry = 0, 0
-        
-        if S: # 도착했다면 그대로
-            Rx, Ry = rx, ry
-        else: # 도착못했으면 옮김
-            Rx, Ry = dire[i][0] + rx, dire[i][1] + ry
-            
-        if not (0 <= Rx < len(graph) and 0 <= Ry < len(graph[0])) :
-            continue
-            
-        # 부딪힌다면
-        if Rx == bx and Ry == by: continue
-        
-        if (not S and visit[0][Rx][Ry]) or graph[Rx][Ry] == 5 : continue
-        
-        visit[0][Rx][Ry] = 1
-        
-        for j in range(4):
-            Bx, By = 0, 0
+        # 파란거부터 옮기는 코드
+        for i in range(4):
+            Bx, By = bx + dire[i][0], by + dire[i][1]
             if B:
                 Bx, By = bx, by
-            else:
-                Bx, By = dire[j][0] + bx, dire[j][1] + by
+            if CHECK(Bx, By, graph) : continue
+            if Bx == rx and By == ry: continue
+            if graph[Bx][By] == 5 : continue
             
-            if not (0 <= Bx < len(graph) and 0 <= By < len(graph[0])) :
-                continue
-            if Bx == Rx and By == Ry: continue
-            if (not B and visit[1][Bx][By]) or graph[Bx][By] == 5: continue
             
-            visit[1][Bx][By] = 1
-            BACK(graph, Rx, Ry, Bx, By, visit, depth + 1, graph[Rx][Ry] == 3, graph[Bx][By] == 4)
-            visit[1][Bx][By] = 0
-        visit[0][Rx][Ry] = 0
-        
-        # 파란거 먼저@####################################
-        Bx, By = 0, 0
-        if S: # 도착했다면 그대로
-            Rx, Ry = rx, ry
-        else: # 도착못했으면 옮김
-            Rx, Ry = dire[i][0] + rx, dire[i][1] + ry
-            
-        if not (0 <= Rx < len(graph) and 0 <= Ry < len(graph[0])) :
-            continue
-            
-        # 부딪힌다면
-        if Rx == bx and Ry == by: continue
-        
-        if (not S and visit[0][Rx][Ry]) or graph[Rx][Ry] == 5 : continue
-        
-        visit[0][Rx][Ry] = 1
-        
-        for j in range(4):
-            Bx, By = 0, 0
-            if B:
-                Bx, By = bx, by
-            else:
-                Bx, By = dire[j][0] + bx, dire[j][1] + by
-            
-            if not (0 <= Bx < len(graph) and 0 <= By < len(graph[0])) :
-                continue
-            if Bx == Rx and By == Ry: continue
-            if (not B and visit[1][Bx][By]) or graph[Bx][By] == 5: continue
-            
-            visit[1][Bx][By] = 1
-            BACK(graph, Rx, Ry, Bx, By, visit, depth + 1, graph[Rx][Ry] == 3, graph[Bx][By] == 4)
-            visit[1][Bx][By] = 0
-            
-        
+            for j in range(4):
+                Rx, Ry = rx + dire[j][0], ry + dire[j][1]
+                if R:
+                    Rx, Ry = rx, ry
+                if CHECK(Rx, Ry, graph) : continue
+                if visit[Rx][Ry][Bx][By]: continue
+                if Rx == Bx and Ry == By: continue
+                if graph[Rx][Ry] == 5 : continue
+                visit[Rx][Ry][Bx][By] = 1
+                que.append([Rx, Ry, Bx, By, depth + 1, graph[Rx][Ry] == 3, graph[Bx][By] == 4])
+    return 0
+
+
 def solution(maze):
     global answer
-    rx, ry, bx, by = 0, 0, 0, 0
-    
+    RB = [None] * 4
     for i in range(len(maze)):
         for j in range(len(maze[0])):
             if maze[i][j] == 1:
-                rx, ry = i, j
+                RB[0], RB[1] = i, j
             if maze[i][j] == 2:
-                bx, by = i, j
+                RB[2], RB[3] = i, j
                 
-    visit = [[[0] * len(maze[0]) for _ in range(len(maze))] for _ in range(2)]
-    visit[0][rx][ry] = visit[1][bx][by] = 1
-    BACK(maze, rx, ry, bx, by, visit, 0, False, False)
+    visit2 = [[[[0] * 4 for _ in range(4)] for __ in range(4)] for __ in range(4)]
+    return BFS(maze, visit2, RB)
 
-    if answer == 2 ** 31:
-        answer = 0
-    return answer
+
+
+
+
+
+"""
+[
+[5, 0, 0, 5],
+[1, 2, 4, 3],
+[5, 5, 5, 5],
+[5, 5, 5, 5],
+]
+
+
+[
+[5, 5, 5, 5],
+[1, 2, 0, 5],
+[5, 4, 0, 5],
+[5, 3, 5, 5],
+]
+
+[
+[5, 5, 5, 5],
+[1, 3, 0, 5],
+[5, 4, 0, 5],
+[5, 3, 5, 5],
+]
+
+[
+[5, 5, 5, 5],
+[1, 3, 0, 5],
+[5, 0, 2, 5],
+[5, 5, 5, 5],
+]
+
+[
+[5, 1, 0, 0],
+[5, 0, 0, 0],
+[0, 0, 3, 4],
+[2, 5, 5, 5]
+]
+
+[
+[1, 5, 5, 2],
+[0, 5, 5, 0],
+[0, 0, 0, 0],
+[4, 0, 0, 3]
+]
+
+[
+[1, 0, 0, 2],
+[4, 0, 0, 3],
+[0, 0, 0, 0],
+[0, 0, 0, 0]
+]
+
+[
+[3, 4, 5, 2],
+[1, 5, 5, 0],
+[0, 0, 0, 0],
+[0, 0, 0, 0]
+]
+"""
