@@ -89,6 +89,7 @@ while que:
             visit[not status][0][tre[0][0] + 1][tre[0][1] - 1] = 1
             visit[not status][2][tre[2][0] - 1][tre[2][1] + 1] = 1
         else:
+            print(tre)
             visit[not status][0][tre[0][0] - 1][tre[0][1] + 1] = 1
             visit[not status][2][tre[2][0] + 1][tre[2][1] - 1] = 1
 
