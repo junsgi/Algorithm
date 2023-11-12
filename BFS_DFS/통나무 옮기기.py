@@ -9,12 +9,11 @@ for i in range(n):
     for j in range(n):
         if graph[i][j] == 'B':
             tree.append([i, j])
+
 visit = [[[[0] * n for i in range(n)] for _ in range(3)] for __ in range(2)]
+# [세웠냐 눕혔냐][1 ~ 3번째 통나무][x좌표][y좌표]
 
 que = deque()
-temp = []
-
-
 # 깊이
 tree.append(0)
 
@@ -28,89 +27,70 @@ for i in range(3):
     visit[tree[-1]][i][tree[i][0]][tree[i][1]] = 1
 que.append(tree)
 
-def Turn(tre, s):
+# 범위 체크하는 함수
+def limit(x, y):
     global n
-    x, y = 0, 0
-    
-    if s :
-        x = tre[0][1] - 1
-    else:
-        x = tre[0][0] - 1
-    y = x
-    for i in range(x, x + 3):
-        for j in range(y, y + 3):
-            if not (0 <= i < n and 0 <= j < n) or graph[i][j] == '1':
-                return False
-    cnt = 0
-    if s:
-        cnt += visit[not status][0][tre[0][0] + 1][tre[0][1] - 1]
-        cnt += visit[not status][2][tre[2][0] - 1][tre[2][1] + 1]
-    else:
-        cnt += visit[not status][0][tre[0][0] - 1][tre[0][1] + 1]
-        cnt += visit[not status][2][tre[2][0] + 1][tre[2][1] - 1]
+    return 0 <= x < n and 0 <= y < n
 
-    cnt += visit[not status][1][tre[1][0]][tre[1][1]]
+# 3 x 3 배열 체크 후 나무가 없다면 상태를 바꿨을 때 좌표 반환
+def CHECK(T, s):
+    x, y = 0, 0
+    x2, y2= 0, 0
+    if s : 
+        x, y = T[0][0] + 1, T[0][1] - 1
+        x2, y2 = T[2][0] - 1, T[2][1] + 1
+    else:
+        x, y = T[0][0] - 1, T[0][1] + 1
+        x2, y2 = T[2][0] + 1, T[2][1] - 1
+    sx, sy = T[1][0] - 1, T[1][1] - 1
+    for i in range(sx, sx + 3):
+        for j in range(sy, sy + 3):
+            if not limit(i, j) or graph[i][j] == '1':
+                return [[]]
+    return [[x, y], [T[1][0], T[1][1]], [x2, y2]]
+    
+# 방문 체크
+def VISIT(tree, s):
+    cnt = 0
+    for i in range(3):
+        cnt += visit[s][i][tree[i][0]][tree[i][1]]
     return cnt != 3
 
-
-def Check(n, i, tre, status):
-    s = 0
-    for j in range(3):
-        tx, ty = tre[j][0] + dire[i][0], tre[j][1] + dire[i][1]
-        if not (0 <= tx < n and 0 <= ty < n) or graph[tx][ty] == '1':
-            return True
-        s += visit[status][j][tx][ty]
-    return s == 3
-
+ans = 0
 while que:
     t = que.popleft()
-    print(t)
-    tre = [t[0], t[1], t[2]]
+    tree = [t[0], t[1], t[2]]
     depth = t[3]
     status = t[4]
 
-    if graph[tre[0][0]][tre[0][1]] == 'E' and graph[tre[1][0]][tre[1][1]] == 'E' and graph[tre[2][0]][tre[2][1]] == 'E':
-        print(depth)
+    if graph[tree[0][0]][tree[0][1]] == 'E' and graph[tree[1][0]][tree[1][1]] == 'E' and graph[tree[2][0]][tree[2][1]] == 'E':
+        ans = depth
         break
 
-
-    # Turn
-    if Turn(tre, status):
-        temp = []
-        for i in tre: temp.append(i)
-        k = 1
-        for i in range(2):
-            if status:
-                temp[i // 1][i] += k
-            else:
-                temp[i // 2 * 2][i % 2] += -k
-            k = -k
-        if status:
-            visit[not status][0][tre[0][0] + 1][tre[0][1] - 1] = 1
-            visit[not status][2][tre[2][0] - 1][tre[2][1] + 1] = 1
-        else:
-            print(tre)
-            visit[not status][0][tre[0][0] - 1][tre[0][1] + 1] = 1
-            visit[not status][2][tre[2][0] + 1][tre[2][1] - 1] = 1
-
-        visit[not status][1][tre[1][0]][tre[1][1]] = 1
-        que.append([*temp, depth + 1, not status])
-
-
     # 상하좌우
-    for i in range(4):
-
-        if Check(n, i, tre, status): continue
-        temp.clear()
-        for j in range(3):
-            tx, ty = tre[j][0] + dire[i][0], tre[j][1] + dire[i][1]
+    for a, b in dire:
+        swi = False
+        temp = []
+        for i in range(3):
+            tx, ty = tree[i][0] + a, tree[i][1] + b
+            if not limit(tx, ty) or graph[tx][ty] == '1':
+                swi = True
+                break
             temp.append([tx, ty])
-            visit[status][j][tx][ty] = 1
-        que.append([*temp, depth + 1, status])
 
+        if not swi and VISIT(temp, status):
+            for i in range(3):
+                visit[status][i][temp[i][0]][temp[i][1]] = 1
+            temp.append(depth + 1)
+            temp.append(status)
+            que.append(temp)
 
-
-"""
-(1, 0), (2, 0), (3, 0)
-[n번째 통나무위치][x위치][y위치]
-"""
+    # 상태를 바꾼다.
+    temp2 = CHECK(tree, status)
+    if temp2[0] and VISIT(temp2, not status):
+        for i in range(3):
+            visit[not status][i][temp2[i][0]][temp2[i][1]] = 1
+        temp2.append(depth + 1)
+        temp2.append(not status)
+        que.append(temp2)
+print(ans)
