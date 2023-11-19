@@ -5,4 +5,4 @@ t = []
 for _ in range(n + m): t.append(int(input()))
 A = t[:n]
 B = sorted(t[n:])
-tA = []
+tA = [n]
