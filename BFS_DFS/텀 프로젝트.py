@@ -5,17 +5,6 @@ visit = set()
 
 def DFS(node, st):
   global Rota, Team, visit
-
-  if node in visit:
-    result = 0
-    if node in Rota or node != st:
-      Rota |= visit
-      result = 1
-    elif node in Team or node == st:
-      Team |= visit
-      result = 2
-    return result
-
   visit.add(node)  
   return DFS(arr[node], st)
 
