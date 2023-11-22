@@ -14,7 +14,7 @@ def solu():
     global MAX, MIN
     LEN = len(taskQue)
     for _ in range(LEN):
-        
+        pass
 
 for i in range(1, len(arr)):
     st, ed = arr[i][0], arr[i][1]
