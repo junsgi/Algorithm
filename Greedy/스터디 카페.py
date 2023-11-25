@@ -5,7 +5,6 @@ input = sys.stdin.readline
 n, m = map(int, input().split())
 cost = list(map(int, input().split()))
 arr = [list(map(int, input().split())) for _ in range(m)]
-LEN = 0
 cost.sort(reverse=True)
 arr.sort(key = lambda x : (x[0], x[1]))
 
@@ -20,26 +19,25 @@ for st, ed in arr:
         taskQue.clear()
         MAX += (ed - st + 1) * cost[0]
         MIN += (ed - st + 1) * cost[-1]
-        taskQue.append(ed)
     else:
         LEN = len(taskQue)
+        LEN2 = len(cost) - len(taskQue) - 1
         for _ in range(len(taskQue)):
             usingEd = taskQue.popleft()
             taskQue.append(usingEd)
 
-            if LEN > 0:
-                MAX += (usingEd - st + 1) * cost[LEN]
-                MIN += (ed - st + 1) * cost[LEN]
-
-                st = usingEd + 1
-            else:
-                MAX += (usingEd - st + 1) * cost[0]
-                MIN += (ed - st + 1) * cost[-1]
-
+            MAX += (usingEd - st + 1) * cost[LEN]
+            MIN += (usingEd - st + 1) * cost[LEN2]
+            if LEN == 0:
                 break
+            st = usingEd + 1
+            
             LEN -= 1
+            LEN2 += 1
         if st <= ed:
             MAX += (ed - st + 1) * cost[0]
             MIN += (ed - st + 1) * cost[-1]
+    taskQue.append(ed)
+        
 
 print(MIN, MAX)
