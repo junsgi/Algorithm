@@ -1,74 +1,137 @@
 # https://www.acmicpc.net/problem/1799
-dire = [[-1, -1], [-1, 1], [1, 1], [1, -1]]
-
-def RANGE(x, y):
-    global n
-    return 0 <= x < n and 0 <= y < n
-def CHECK(x, y):
-    x1, y1, z1 = x + dire[0][0], y + dire[0][1], True
-    x2, y2, z2 = x + dire[1][0], y + dire[1][1], True
-    x3, y3, z3 = x + dire[2][0], y + dire[2][1], True
-    x4, y4, z4 = x + dire[3][0], y + dire[3][1], True
-    cnt = 4
-
-    while cnt:
-        if z1 and RANGE(x1, y1):
-            if visit[x1][y1]:
-                return False
-            x1 += dire[0][0]; y1 += dire[0][1]
-        else:
-            if z1 :
-                cnt -= 1
-            z1 = False
-
-        if z2 and RANGE(x2, y2):
-            if visit[x2][y2]:
-                return False
-            x2 += dire[1][0]; y2 += dire[1][1]
-        else:
-            if z2:
-                cnt -= 1
-            z2 = False
-
-        if z3 and RANGE(x3, y3):
-            if visit[x3][y3]:
-                return False
-            x3 += dire[2][0]; y3 += dire[2][1]
-        else:
-            if z3:
-                cnt -= 1
-            z3 = False
-
-        if z4 and RANGE(x4, y4):
-            if visit[x4][y4]:
-                return False
-            x4 += dire[3][0]; y4 += dire[3][1]
-        else:
-            if z4:
-                cnt -= 1
-            z4 = False
-    return True
-             
+import sys
+input = sys.stdin.readline
 def BACK(depth, cnt):
-    global ans
+    global ans, n
+    
     if depth == len(location):
+        ans = max(ans, cnt)
         return
-    ans = max(ans, cnt)
+    
+    if ans == n + (n - 2):
+        if not depth : ans += 1
+        print(ans)
+        exit()
+    # 현재 사용중인 비숍 + (더 놓을 수 있는 비숍 개수)
+    if cnt + (len(location) - depth) <= ans: return
     x, y = location[depth][0], location[depth][1]
-    if CHECK(x, y): # 선택한다
-        visit[x][y] = 1
+    if not (left[x - y + n] + right[x + y]): # 선택한다
+        left[x - y + n] = right[x + y] = 1
         BACK(depth + 1, cnt + 1)
-        visit[x][y] = 0
+        left[x - y + n] = right[x + y] = 0
+
     # 안 한다.
     BACK(depth + 1, cnt)
 n = int(input())
 ans = 0
-visit = [[0] * n for _ in range(n)]
+left = [0] * (50)
+right = [0] * (50)
 location = []
 for i in range(n):
     arr = list(map(int, input().split()))
     for j in range(n):
         if arr[j]:
             location.append([i, j])
+
 BACK(0, 0)
 print(ans)
+"""
+최악의 경우 2 ^ 100번 만큼 연산을 하게됨
+2 * 2의 경우 최대로 놓을 수 있는 개수 = 2
+3 * 3의 경우 최대로 놓을 수 있는 개수 = 4
+4 * 4의 경우 최대로 놓을 수 있는 개수 = 6
+즉 비숍이 n + (n - 2)개 놓이면 최대로 놓았으므로 더이상 탐색하지 않는다.
+
+3
+1 1 1
+1 1 1
+1 1 1
+
+ans:4
+
+--------------------------------------------
+
+4
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+ans:6
+
+--------------------------------------------
+
+5
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+
+ans:8
+
+--------------------------------------------
+
+8
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+
+ans:14
+
+--------------------------------------------
+
+10
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+
+ans:18
+
+여기까지 되면 시간복잡도는 충분하다.
+
+--------------------------------------------
+
+5
+1 1 0 1 1
+0 1 0 0 1
+1 0 1 0 1
+1 0 0 0 0
+1 0 1 1 1
+
+ans:8
+
+--------------------------------------------
+
+5
+0 0 0 0 0
+0 1 0 1 0
+1 0 0 0 1
+0 1 0 1 0
+0 0 0 0 0
+
+ans:3
+
+--------------------------------------------
+
+5
+0 0 0 1 0
+0 0 1 0 0
+0 1 0 1 0
+0 0 1 0 0
+0 0 0 1 0
+
+ans:3
+"""
