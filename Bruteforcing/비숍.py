@@ -1,40 +1,38 @@
 # https://www.acmicpc.net/problem/1799
 import sys
 input = sys.stdin.readline
-def BACK(depth, cnt):
-    global ans, n
+def BACK(depth, cnt, sel):
+    global n
     
-    if depth == len(location):
-        ans = max(ans, cnt)
+    if depth == len(location[sel]):
+        ans[sel] = max(ans[sel], cnt)
         return
-    
-    if ans == n + (n - 2):
-        if not depth : ans += 1
-        print(ans)
-        exit()
     # 현재 사용중인 비숍 + (더 놓을 수 있는 비숍 개수)
-    if cnt + (len(location) - depth) <= ans: return
-    x, y = location[depth][0], location[depth][1]
+    if cnt + (len(location[sel]) - depth) <= ans[sel]: return
+    
+    
+    x, y = location[sel][depth][0], location[sel][depth][1]
     if not (left[x - y + n] + right[x + y]): # 선택한다
         left[x - y + n] = right[x + y] = 1
-        BACK(depth + 1, cnt + 1)
+        BACK(depth + 1, cnt + 1, sel)
         left[x - y + n] = right[x + y] = 0
 
     # 안 한다.
-    BACK(depth + 1, cnt)
+    BACK(depth + 1, cnt, sel)
 n = int(input())
-ans = 0
+ans = [0, 0]
 left = [0] * (50)
 right = [0] * (50)
-location = []
+location = [[], []]
 for i in range(n):
     arr = list(map(int, input().split()))
     for j in range(n):
         if arr[j]:
-            location.append([i, j])
-
-BACK(0, 0)
+            location[(i + j) % 2].append([i, j])
+BACK(0, 0, 0)
+BACK(0, 0, 1)
 print(ans)
+print(ans[0] + ans[1])
 """
 최악의 경우 2 ^ 100번 만큼 연산을 하게됨
 2 * 2의 경우 최대로 놓을 수 있는 개수 = 2
