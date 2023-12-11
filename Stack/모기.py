@@ -1,32 +1,22 @@
 # https://www.acmicpc.net/problem/20440
-from heapq import heappush, heappop
-import sys
-input = sys.stdin.readline
+from collections import defaultdict
 n = int(input())
-arr = [list(map(int, input().split())) for _ in range(n)]
-arr.sort(key = lambda x : x[0])
-stk = []
-ans = []
-for st, ed in arr:
-    if not stk or stk[-1][1] > st:
-        stk.append([st, ed])
-    else:
-        temp = [-len(stk), 0, 1e12]
-        while stk and stk[-1][1] <= st:
-            e = stk.pop()
-            temp[1] = max(temp[1], e[0])
-            temp[2] = min(temp[2], e[1])
-        stk.append([st, ed])
-        heappush(ans, temp)
-
-if stk:
-    temp = [-len(stk), stk[-1][0],stk[-1][1]]
-    stk.pop()
-    while stk:
-        e = stk.pop()
-        temp[1] = max(temp[1], e[0])
-        temp[2] = min(temp[2], e[1])
-    heappush(ans, temp)
-result = heappop(ans)
-print(-result[0])
-print(result[1], result[2])
+dic = defaultdict(int)
+for i in range(n):
+    st, ed = map(int, input().split())
+    dic[st] += 1
+    dic[ed] -= 1
+ans = [0, 0, 0]
+temp = 0
+swi = False
+for k in sorted(dic.keys()):
+    temp += dic[k]
+    if temp > ans[0]:
+        ans[0] = temp
+        ans[1] = k
+        swi = True
+    elif temp < ans[0] and temp - dic[k] == ans[0] and swi:
+        ans[2] = k
+        swi = False
+print(ans[0])
+print(ans[1], ans[2])
