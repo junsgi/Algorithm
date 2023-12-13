@@ -29,10 +29,10 @@ for _ in range(n):
                 heappop(MIN)
             print(MIN[0][1])
         else:
-            while info[MAX[0][1]] != 0:
-                info[MAX[0][1]] -= 1
+            while info[-MAX[0][1]] != 0:
+                info[-MAX[0][1]] -= 1
                 heappop(MAX)
             print(-MAX[0][1])
 
     elif com[0][0] == 's':
-        info[com[1]] += 1
+        info[int(com[1])] += 1
