@@ -3,6 +3,7 @@ import sys
 sys.setrecursionlimit(100_000)
 def DIV(node, start, end):
     global n
+    
     if node in check or end - abs(start) <= 0:
         return
 
@@ -10,9 +11,10 @@ def DIV(node, start, end):
     check.add(node)
     
     newLeftLength = inOrderInfo[node] - start
-    DIV(postOrder[newLeftLength - 1], start, newLeftLength)
+    DIV(postOrder[newLeftLength - 1], start, newLeftLength + 1)
 
-    DIV(postOrder[postOrderInfo[node] - 1], inOrderInfo[node], end)
+    newRightLength = end - (newLeftLength + 1)
+    DIV(postOrder[postOrderInfo[node] - 1], newLeftLength + 1, newLeftLength + newRightLength)
 
 n = int(input())
 inOrderInfo = {}
@@ -24,7 +26,7 @@ for i in range(n):
     inOrderInfo[inOrder[i]] = i
     postOrderInfo[postOrder[i]] = i
 root = postOrder[-1]
-DIV(root, 0, n)
+DIV(root, 0, n - 1)
 """
 7
 3 2 5 4 1 6 7
@@ -35,4 +37,6 @@ DIV(root, 0, n)
 9
 2 1 4 6 3 9 7 5 8
 2 6 4 9 7 8 5 3 1
+
+1 2 3 6 4 5 7 9 8
 """
