@@ -20,8 +20,8 @@ n = int(input())
 value = [0]
 graph = defaultdict(list)
 que = deque()
-DP = [[0] * (n + 1) for _ in range(n + 1)]
-WEIGHT = [[0] * (n + 1) for _ in range(n + 1)]
+DP = [[0] * (n + 1) for _ in range(20)]
+WEIGHT = [[0] * (n + 1) for _ in range(20)]
 visit = [0] * (n + 1)
 cnt = 0
 for _ in range(n):
@@ -45,8 +45,8 @@ for i in range(1, cnt + 1):
 for i in range(1, n + 1):
     user = i
     for j in range(cnt, -1, -1):
-        if WEIGHT[j][user] <= value[user]:
-            value[user] -= WEIGHT[j][user]
+        if WEIGHT[j][user] <= value[i]:
+            value[i] -= WEIGHT[j][user]
             user = DP[j][user]
     if not user: 
         user += 1
