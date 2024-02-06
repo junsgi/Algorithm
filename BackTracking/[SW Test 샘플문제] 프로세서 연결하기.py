@@ -1,7 +1,7 @@
 # https://swexpertacademy.com/main/code/problem/problemDetail.do?contestProbId=AV4suNtaXFEDFAUf
 """
 단순한 구현 문제
-사용된 코어와 사용할 코어의 개수가 최대로 사용했던 코어의 개수보다 적으면 더이상 탐색하지 않는다.
+사용된 코어와 사용할 코어의 개수가 최대로 사용했던 코어의 개수보다 적으면 더이상 탐색하지 않는다. 
 """
 dire = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
