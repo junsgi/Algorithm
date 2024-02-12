@@ -1,4 +1,5 @@
 # https://www.acmicpc.net/problem/1253
+
 n = int(input())
 arr = list(map(int, input().split()))
 arr.sort()
