@@ -8,7 +8,7 @@ ans = 0
 for i in range(1, n):
     cnt = 0
     # 현재 선 연결
-    DP[i] = 1
+    DP[i] = 1 
 
     for j in range(i - 1, -1, -1):
         # 겹치는 줄이 없다면 DP 배열에 겹치지 않으면서 
