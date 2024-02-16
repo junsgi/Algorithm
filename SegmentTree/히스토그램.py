@@ -38,7 +38,5 @@ while idx <= n :
 for i in range(1, n + 1):
     m = int(input())
     insert(i, m)
-check = 1
-cnt = 1
 분할(1, n)
 print(ans)
