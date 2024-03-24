@@ -1,4 +1,4 @@
-# https://school.programmers.co.kr/learn/courses/30/lessons/250136
+ # https://school.programmers.co.kr/learn/courses/30/lessons/250136
 
 from collections import deque
 que = deque()
