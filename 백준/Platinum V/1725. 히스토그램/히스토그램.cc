@@ -8,7 +8,7 @@ typedef pair<int, int> temp;
 int n, cnt, a, i, ans;
 temp seg[1 << 18];
 temp MIN(temp a, temp b) { return a.first < b.first ? a : b; }
-temp insert(int left, int right, int idx)
+temp insert(int left, int right, int idx) 
 {
 	int mid = (left + right) / 2;
 	if (i < left || right < i) return seg[idx];
