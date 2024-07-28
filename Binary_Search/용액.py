@@ -5,7 +5,7 @@ n = int(input())
 MAX = 0x7fffffff
 arr = list(map(int, input().split()))
 answer = [MAX, MAX]
-for i in range(n):
+for i in range(n): 
     target = -arr[i]
     le = i + 1
     ri = n - 1
