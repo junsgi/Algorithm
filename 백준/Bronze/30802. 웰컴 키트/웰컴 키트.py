@@ -1,0 +1,5 @@
+n = int(input())
+a = tuple(map(int, input().split()))
+t, p = map(int, input().split())
+print(sum(map(lambda x : x // t + (1 if x % t else 0), a)))
+print(n // p, n % p)
