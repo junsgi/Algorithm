@@ -7,7 +7,7 @@ typedef long long ll;
 typedef pair<ll, ll> temp;
 int n, a, cnt, arr[1 << 18], MAX;
 temp seg[1 << 19];
-ll sum, answer= 1;
+ll sum, answer = 1;
 temp insert(int left, int right, int idx)
 {
 	int mid = (left + right) / 2;
