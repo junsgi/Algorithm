@@ -6,7 +6,6 @@ def req(s, t):
         return 1
     if len(s) == len(t):
         return 0
-    
     if t[-1] == 'B':
         t = t[:-1]
         t = t[::-1]
