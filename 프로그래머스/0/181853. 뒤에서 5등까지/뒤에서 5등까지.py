@@ -1,0 +1,1 @@
+solution = lambda num_list: sorted(num_list)[:5]
