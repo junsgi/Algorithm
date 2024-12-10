@@ -6,7 +6,7 @@ def solution(word, pages):
     for i in range(len(pages)):
         name = re.search('<meta property=\"og:url\" content=\"https://([\S]+)\".*/>', pages[i]).group(1) #현재 url검색
         
-        link = re.findall('<a href=\"https://([\S]+)\">', pages[i]) #외부 링크 url 전부 검색
+        link = re.findall('<a href=\"https://(\S+)\">', pages[i]) #외부 링크 url 전부 검색
         
         score = 0
         for j in re.findall("[a-zA-Z]+", pages[i].lower()):
