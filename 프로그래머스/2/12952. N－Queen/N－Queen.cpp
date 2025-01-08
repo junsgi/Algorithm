@@ -13,6 +13,7 @@ int dfs(int row, int n)
     int result = 0;
     for(int i = 0 ; i < n ; i++)
     {
+        // 열, 왼쪽 위, 오른쪽 위
         if (col[i] + lr[row - i + n] + rr[row + i]) continue;
         col[i] = lr[row - i + n] = rr[row + i] = 1;
         result += dfs(row + 1, n);
