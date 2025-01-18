@@ -4,7 +4,7 @@ def solution(arr):
     check = [[0] * len(arr) for _ in range(len(arr))]
     def div(x, y, length, size):
         # 방문했다면 돌아감
-        if check[x][y]: return
+        if check[x][y]:  return
         # 현재 크기가 1이면 갱신과 방문체크 후 돌아감 
         if size == 1:
             answer[arr[x][y]] += 1
