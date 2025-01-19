@@ -2,7 +2,7 @@
 def solution(n, left, right):
     answer = []
     for i in range(left, right + 1):
-        x = i // n
+        x = i // n 
         y = i % n
         if x <= y:
             answer.append(y + 1)
