@@ -1,6 +1,6 @@
 # https://school.programmers.co.kr/learn/courses/30/lessons/68936
 def solution(arr):
-    answer = [0, 0]
+    answer = [0, 0] 
     check = [[0] * len(arr) for _ in range(len(arr))]
     def div(x, y, length, size):
         # 방문했다면 돌아감
