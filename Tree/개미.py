@@ -15,7 +15,7 @@ def BFS():
             WEIGHT[0][v] = c
             que.append(v)
             
-
+ 
 n = int(input())
 value = [0]
 graph = defaultdict(list)
