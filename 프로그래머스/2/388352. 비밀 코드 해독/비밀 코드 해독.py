@@ -1,23 +1,19 @@
-def p(depth, idx, tmp, limit):
-    if depth == 5:
-        return [tmp]
-    res = []
-    for i in range(idx, limit + 1):
-        for j in p(depth + 1, i + 1, tmp + [i], limit):
-            res.append(j)
-    return res
 def solution(n, q, ans):
     answer = 0
-    arr = p(0, 1, [], n)
-    for a in arr:
-        tmp = [0] * len(ans)
-        for i in range(len(q)):
-            for j in q[i]:
-                if j in a:
-                    tmp[i] += 1
-            if tmp[i] > ans[i]:
-                break
-        else:
-            if tmp == ans:
-                answer += 1
+    for i in range(1, n + 1):
+        for j in range(i + 1, n + 1):
+            for k in range(j + 1, n + 1):
+                for l in range(k + 1, n + 1):
+                    for m in range(l + 1, n + 1):
+                        tmp = [i, j, k, l, m]
+                        tns = [0] * len(ans)
+                        for x in range(len(q)):
+                            for y in q[x]:
+                                if y in tmp:
+                                    tns[x] += 1
+                            
+                            if tns[x] != ans[x]:
+                                break
+                        else:
+                            answer += 1
     return answer
