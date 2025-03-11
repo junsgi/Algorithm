@@ -1,5 +1,5 @@
 # https://www.acmicpc.net/problem/1799
-import sys
+import sys 
 input = sys.stdin.readline
 def BACK(depth, cnt, sel):
     global n
