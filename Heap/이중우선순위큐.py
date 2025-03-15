@@ -1,7 +1,7 @@
 # https://school.programmers.co.kr/learn/courses/30/lessons/42628
 from heapq import heappush, heappop
 from collections import deque
-def solution(operations):
+def solution(operations): 
     heap = []
     que = deque()
 
