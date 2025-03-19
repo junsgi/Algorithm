@@ -9,4 +9,4 @@ for i in range(2, n + 1):
     DP[i][9] = DP[i - 1][8]
     for j in range(1, 9):
         DP[i][j] = (DP[i - 1][j - 1] + DP[i - 1][j + 1]) % 1_000_000_000
-print(sum(DP[n][1:]) % 1_000_000_000 )
+print(sum(DP[n][1:]) % 1_000_000_000)
