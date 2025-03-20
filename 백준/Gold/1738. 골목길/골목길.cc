@@ -1,70 +1,108 @@
-#pragma warning(disable:4996)
+// 유효한 길 설정(메모이제이션) -> 양수 사이클 확인(벨만포드) -> 출력(BFS).
 #include<stdio.h>
-#include<algorithm>
 #include<vector>
-#define M -1'000'000'000
+#define MAX(x,y)((x)>(y)?(x):(y))
+#define M 1<<31
 using namespace std;
-struct temp {
-	int st, ed, cost;
-}arr[20000];
-int n, m, path[111], que[101], check[101], st = -1, ed = -1;
-long long cost[1000];
-vector<int> graph[111];
-int BellmanFord()
+struct Temp
 {
-	int res = 0;
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-		{
-			if (cost[arr[j].st] == M) continue;
-			if (cost[arr[j].ed] < cost[arr[j].st] + arr[j].cost)
-			{
-				cost[arr[j].ed] = cost[arr[j].st] + arr[j].cost;
-				path[arr[j].ed] = arr[j].st;
-				if (i == n - 1 && check[arr[j].ed]) res = 1; // 마지막에 영향을 주는 지점의 값이 바뀐다면 도착할 수 없음
-			}
-		}
-	}
-	return res;
+    int s, e, w;
+};
+int n, m, valid[101], visit[101], cost[101], path[111], que[111], front, rear;
+vector<Temp> arr, Rgraph[101];
+vector<int> graph[101];
+int bellmanford()
+{
+    for (int i = 1; i <= n; i++)
+        cost[i] = M;
+    cost[1] = 0;
+    int hit = 0;
+    for (int i = 0; i < n; i++)
+    {
+        hit = 0;
+        for (Temp& j : arr)
+        {
+            if (cost[j.s] == M) continue;
+            if (cost[j.e] < cost[j.s] + j.w)
+            {
+                cost[j.e] = cost[j.s] + j.w;
+                if (valid[j.s])
+                    hit = 1;
+            }
+        }
+    }
+    return hit;
 }
-void BFS() // 콘도에서부터 시작하여 시작점과 콘도사이에 영향을 주는 지점만 체크
+int memo(int node)
 {
-    que[++ed] = n;
-	check[n] = 1;
-	while (st != ed)
-	{
-		int node = que[++st];
-		for (int i = 0; i < (int)graph[node].size(); i++)
-		{
-			if (check[graph[node][i]])continue;
-			que[++ed] = graph[node][i];
-			check[que[ed]] = 1;
-		}
-	}
+    if (valid[node]) return 1;
+    for (int tnode : graph[node])
+    {
+        if (visit[tnode]) continue;
+        visit[tnode] = 1;
+        valid[node] = MAX(valid[node], memo(tnode));
+    }
+    return valid[node];
 }
-void d(int node)
+void pp(int node)
 {
-	if (path[node] == -1)
-	{
-		printf("%d ", node);
-		return;
-	}
-	d(path[node]);
-	printf("%d ", node);
+    if (path[node] == -1)
+    {
+        printf("%d", n);
+        return;
+    }
+    printf("%d ", que[node]);
+    pp(path[node]);
+}
+void answer()
+{
+    front = rear = -1;
+    for (int i = 0; i <= n; i++) 
+        visit[i] = 0;
+    que[++rear] = n;
+    visit[n] = 1;
+    path[0] = -1;
+    while (front != rear)
+    {
+        int node = que[++front];
+        if (node == 1)
+        {
+            pp(front);
+            return;
+        }
+        for (Temp i : Rgraph[node])
+        {
+            int tnode = i.e;
+            int weight = i.w;
+            if (visit[tnode]) continue;
+            if (cost[node] != cost[tnode] + weight) continue;
+            que[++rear] = tnode;
+            visit[tnode] = 1;
+            path[rear] = front;
+        }
+    }
+}
+void solution()
+{
+    scanf("%d%d", &n, &m);
+    for (int i = 0; i < m; i++)
+    {
+        int s, e, w;
+        scanf("%d%d%d", &s, &e, &w);
+        arr.push_back({ s, e, w });
+        graph[s].push_back(e);
+        Rgraph[e].push_back({-1, s, w});
+    }
+    valid[n] = 1;
+    visit[1] = 1;
+    memo(1); 
+    if (!bellmanford())
+        answer();
+    else
+        printf("-1");
 }
 int main()
 {
-	scanf("%d%d", &n, &m);
-	path[1] = -1;
-	for (int i = 2; i <= n; i++) cost[i] = M;
-	for (int i = 0; i < m; i++)
-	{
-		scanf("%d%d%d", &arr[i].st, &arr[i].ed, &arr[i].cost);
-		graph[arr[i].ed].push_back(arr[i].st);
-	}
-	BFS();
-	if (BellmanFord() || cost[n] == M) printf("-1");
-	else d(n);
-	return 0;
+    solution();
+    return 0;
 }
