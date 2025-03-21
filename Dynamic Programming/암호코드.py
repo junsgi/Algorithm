@@ -3,7 +3,7 @@
 n = "."
 n = n + input()
 if n[1] == '0':
-    print(0)
+    print(0) 
     exit()
 
 DP = [0] * (len(n) + 1)
