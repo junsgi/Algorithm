@@ -1,41 +1,54 @@
 #include<stdio.h>
-int n;
-bool isPri(int num)
+char temp[10];
+int isPalindrome(long long n)
 {
-	for(int i = 2 ; i * i <= num ; i++)
-	{
-		if (num % i == 0) return false;
-	}
-	return true;
+    int len = 0;
+    while (n)
+    {
+        temp[len++] = n % 10 + '0';
+        n /= 10;
+    }
+    for (int i = 0; i < len / 2; i++)
+    {
+        if (temp[i] != temp[len - i - 1])
+            return 0;
+    }
+    return 1;
 }
-bool isPalin(int num)
+int root(long long n)
 {
-	int arr[10] = {0,};
-	int len = 0;
-	while (num)
-	{
-		arr[len++] = num % 10;
-		num/=10;
-	}
-	for(int i = 0 ; i < len / 2 ; i++)
-	{
-		if (arr[i] != arr[len - i - 1])
-			return false;
-	}
-	return true;
+    long long left = 0, right = n - 1;
+    while (left <= right)
+    {
+        long long mid = (left + right) / 2;
+        if (mid * mid < n)
+            left = mid + 1;
+        else if (mid * mid > n)
+            right = mid - 1;
+        else
+            return mid;
+    }
+    return right;
+}
+int isPrime(long long n)
+{
+    for (int i = 2; i <= root(n); i++)
+        if (n % i == 0) return 0;
+    return 1;
 }
 int main()
 {
-	scanf("%d", &n);
-	if (n == 1)n++;
-	while(1)
-	{
-		if (isPri(n) && isPalin(n)) 
-		{
-			printf("%d ", n);
-			break;
-		}
-		n++;
-	}
-	return 0;
+    long long n;
+    scanf("%lld", &n);
+    if (n == 1) n++;
+    while (1)
+    {
+        if (isPrime(n) && isPalindrome(n))
+        {
+            printf("%lld", n);
+            return 0;
+        }
+        n++;
+    }
+    return 0;
 }
