@@ -1,54 +1,37 @@
-/*
-1. 가장 큰 가중치와 두 번째로 큰 가중치를 구하여 정답을 갱신
-2. 부모는 가장 큰 가중치만 사용하여 계산한다.
-*/
-#pragma warning(disable:4996)
 #include<stdio.h>
 #include<vector>
-#define M 100'001
-#define MAX(x,y) (((x)>(y)) ? (x):(y))
 using namespace std;
-int n, st, ed, c, visit[M], value[M], ans;
-vector<pair<int, int>> graph[M];
-void DFS(int node)
+struct Temp { int node, w; };
+int n, ans;
+vector<struct Temp> tree[10'001];
+int dfs(int node)
 {
-	visit[node] = 1;
-	int first = 0, fn = 0, second = 0, sn = 0;
-	for (int i = 0; i < (int)graph[node].size(); i++)
+	if (tree[node].size() == 0) return 0;
+	int m1 = 0, m2 = 0;
+	for (Temp& t : tree[node])
 	{
-		int tnode = graph[node][i].first;
-		int tcost = graph[node][i].second;
-		if (visit[tnode]) continue;
-		DFS(tnode);
-		if (first < value[tnode] + tcost)
+		int res = dfs(t.node);
+		if (m1 < res + t.w)
 		{
-			if (first)
-			{
-				second = first;
-				sn = fn;
-			}
-			first = value[tnode] + tcost;
-			fn = tnode;
+			m2 = m1;
+			m1 = res + t.w;
 		}
-		else if (second < value[tnode] + tcost)
-		{
-			second = value[tnode] + tcost;
-			sn = tnode;
-		}
+		else
+			m2 = m2 < res + t.w ? res + t.w : m2;
 	}
-	ans = MAX(ans, first + second);
-	value[node] = first;
+	ans = ans < m1 + m2 ? m1 + m2 : ans;
+	return m1;
 }
 int main()
 {
 	scanf("%d", &n);
 	for (int i = 0; i < n - 1; i++)
 	{
-		scanf("%d%d%d", &st, &ed, &c);
-		graph[st].push_back({ ed, c });
-		graph[ed].push_back({ st, c });
+		int a, b, c;
+		scanf("%d%d%d", &a, &b, &c);
+		tree[a].push_back({ b, c });
 	}
-	DFS(1);
+	dfs(1);
 	printf("%d", ans);
 	return 0;
 }
