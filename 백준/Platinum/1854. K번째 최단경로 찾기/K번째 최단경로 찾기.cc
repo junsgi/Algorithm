@@ -2,131 +2,114 @@
 #include<stdio.h>
 #include<vector>
 using namespace std;
-int len, v, e, k;
-long long MAX = 0x7fffffff, visit[1001];
-vector<pair<int, int>> graph[10001];
-vector<long long> result[1001];
-pair<int, long long> heap[4'000'000];
-
-void up(int idx)
+struct Temp {
+    int node, w;
+    bool operator<(const Temp& other) const {
+        return w < other.w;
+    }
+};
+int n, m, k;
+vector<int> maxHeap[1001];
+vector<Temp> heap, graph[1001];
+template <typename T>
+void up(int idx, vector<T>& heap);
+template <typename T>
+void down(int idx, vector<T>& heap);
+void init()
 {
-	if (idx / 2 <= 0) return;
-	
-	if (heap[idx].second < heap[idx / 2].second)
-	{
-		pair<int, long long> tmp = heap[idx];
-		heap[idx] = heap[idx / 2];
-		heap[idx / 2] = tmp;
-		up(idx / 2);
-	}
-}
-void down(int idx)
-{
-	if (idx * 2 > len) return;
-	int child = idx * 2;
-	if (child + 1 <= len && heap[child].second > heap[child + 1].second)
-		child++;
-	if (heap[idx].second > heap[child].second)
-	{
-		pair<int, long long> tmp = heap[idx];
-		heap[idx] = heap[child];
-		heap[child] = tmp;
-		down(child);
-	}
-}
-
-void up2(int idx, vector<long long> &heap)
-{
-	if (idx / 2 <= 0) return;
-	
-	if (heap[idx] > heap[idx / 2])
-	{
-		long long tmp = heap[idx];
-		heap[idx] = heap[idx / 2];
-		heap[idx / 2] = tmp;
-		up2(idx / 2, heap);
-	}
-}
-
-void down2(int idx, vector<long long> &heap, int size)
-{
-	if (idx * 2 > size) return;
-	int child = idx * 2;
-	if (child + 1 <= size && heap[child] < heap[child + 1])
-		child++;
-
-	if (heap[idx] < heap[child])
-	{
-		long long tmp = heap[idx];
-		heap[idx] = heap[child];
-		heap[child] = tmp;
-		down2(child, heap, size);
-	}
+    scanf("%d%d%d", &n, &m, &k);
+    for (int i = 0; i < m; i++)
+    {
+        int a, b, c;
+        scanf("%d%d%d", &a, &b, &c);
+        graph[a].push_back({ b, c });
+    }
+    // 최소힙, 최대힙 초기화
+    heap = vector<Temp>(1);
+    for (int i = 1; i <= n; i++)
+        maxHeap[i] = vector<int>(1);
 }
 void dijkstra()
 {
-	for (int i = 1; i <= v; i++)
-		result[i].push_back(0);
-	result[1].push_back(0);
+    heap.push_back({ 1, 0 });
+    maxHeap[1].push_back(0);
+    while (heap.size() != 1)
+    {
+        int node = heap[1].node;
+        int weight = heap[1].w;
+        heap[1] = heap.back();heap.pop_back();
+        down(1, heap);
+        if (maxHeap[node].size() - 1 == k && -maxHeap[node][1] < weight ) continue;
+        for (Temp& i : graph[node])
+        {
+            int tnode = i.node;
+            int tw = i.w;
+            if (maxHeap[tnode].size() - 1 < k)
+            {
+                maxHeap[tnode].push_back(-(weight + tw));
+                up((int)maxHeap[tnode].size() - 1, maxHeap[tnode]);
 
-	heap[++len] = { 1, 0 };
-	up(len);
+                heap.push_back({ tnode, weight + tw });
+                up((int)heap.size() - 1, heap);
+            }
+            else if (-maxHeap[tnode][1] > weight + tw) // 최대값이 현재 가중치보다 크다면 빼고 현재 가중치를 넣는다
+            {
+                maxHeap[tnode][1] = maxHeap[tnode].back();
+                maxHeap[tnode].pop_back();
+                down(1, maxHeap[tnode]);
 
-	while (len)
-	{
-		pair<int, long long> tmp = heap[1];
-		heap[1] = heap[len--];
-		down(1);
+                maxHeap[tnode].push_back(-(weight + tw));
+                up((int)maxHeap[tnode].size() - 1, maxHeap[tnode]);
 
-		int cur_node = tmp.first;
-		long long cur_cost = tmp.second;
-		for (int i = 0; i < (int)graph[cur_node].size(); i++)
-		{
-			int next_node = graph[cur_node][i].first;
-			long long new_cost = (long long)graph[cur_node][i].second + cur_cost;		
-			int rlen = result[next_node].size() - 1;
-
-			if (rlen < k)
-			{
-				heap[++len] = { next_node, new_cost };
-				up(len);
-
-				result[next_node].push_back(new_cost);
-				up2(rlen + 1, result[next_node]);
-			}
-			else if (result[next_node][1] > new_cost)
-			{
-				heap[++len] = { next_node, new_cost };
-				up(len);
-
-				result[next_node][1] = result[next_node][rlen];
-				result[next_node][rlen] = -MAX;
-				down2(1, result[next_node], rlen);
-
-
-				result[next_node].push_back(new_cost);
-				up2(rlen + 1, result[next_node]);
-			}
-		}
-	}
+                heap.push_back({ tnode, weight + tw });
+                up((int)heap.size() - 1, heap);
+            }
+        }
+    }
+}
+void answer()
+{
+    for (int i = 1; i <= n; i++)
+    {
+        if (maxHeap[i].size() - 1 != k)
+            printf("-1\n");
+        else
+            printf("%d\n", -maxHeap[i][1]);
+    }
 }
 int main()
 {
-	scanf("%d%d%d", &v, &e, &k);
-	for (int i = 0; i < e; i++)
-	{
-		int st, ed, co;
-		scanf("%d%d%d", &st, &ed, &co);
-		graph[st].push_back({ ed, co });
-	}
-	dijkstra();
-	for (int i = 1; i <= v; i++)
-	{
-		int cnt = 0, rlen = (int)result[i].size() - 1;
-		long long ans = -1;
-		if (rlen >= k)
-			ans = result[i][1];
-		printf("%lld\n", ans);
-	}
-	return 0;
+    init();
+    dijkstra();
+    answer();
+    return 0;
+}
+
+
+template <typename T>
+void up(int idx, vector<T>& heap)
+{
+    if (idx / 2 == 0) return;
+    if (heap[idx] < heap[idx / 2])
+    {
+        auto temp = heap[idx];
+        heap[idx] = heap[idx / 2];
+        heap[idx / 2] = temp;
+        up(idx / 2, heap);
+    }
+}
+template <typename T>
+void down(int idx, vector<T>& heap)
+{
+    int child = idx * 2;
+    if (child >= heap.size()) return;
+    if (child + 1 < heap.size() && heap[child + 1] < heap[child]) child++;
+    if (heap[child] < heap[idx])
+    {
+        auto temp = heap[idx];
+        heap[idx] = heap[child];
+        heap[child] = temp;
+        down(child, heap);
+    }
+
 }
