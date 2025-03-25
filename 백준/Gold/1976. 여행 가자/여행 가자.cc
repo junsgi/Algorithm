@@ -1,49 +1,42 @@
-#pragma warning(disable:4996)
 #include<stdio.h>
-#include<algorithm>
-#define M 100010
-using namespace std;
-int check[M];
-int n, m, a, ans = 1, MAX;
-int arr[M];
-int find(int node)
+int n, m, p[200], a;
+int find(int x)
 {
-	if (check[node] == node)
-		return check[node];
-	check[node] = find(check[node]);
-	return check[node];
+	if (p[x] == x) return x;
+	return p[x] = find(p[x]);
 }
-void Union(int fx, int fy)
+void Union(int x, int y)
 {
+	int fx = find(x), fy = find(y);
 	if (fx < fy)
-		check[fx] = fy;
-	else
-		check[fy] = fx;
+		p[fy] = fx;
+	else if (fx > fy)
+		p[fx] = fy;
 }
 int main()
 {
 	scanf("%d%d", &n, &m);
-	for (int i = 1; i <= n; i++) check[i] = i;
-	for (int i = 1; i <= n; i++)
+    for(int i = 0 ; i < n ; i++) p[i] = i;
+	for (int i = 0; i < n; i++)
 	{
-		for (int j = 1; j <= n; j++)
+		for (int j = 0; j < n; j++)
 		{
 			scanf("%d", &a);
-			if (a == 1) // 연결되어 있다면
-			{
-				int fx = find(i);
-				int fy = find(j);
-				if (fx != fy)
-					Union(fx, fy);
-			}
+			if (a) Union(i, j);
 		}
 	}
-	for (int i = 1; i <= m; i++)
-		scanf("%d", &arr[i]);
-	for (int i = 2; i <= m; i++)
-		if (find(arr[i - 1]) == find(arr[i])) ans++;
-    
-	if (ans == m) printf("YES");
-	else printf("NO");
+	int start;
+	scanf("%d", &start);
+	start = find(start - 1);
+	for (int i = 0; i < m - 1; i++)
+	{
+		scanf("%d", &a);
+		if (start != find(a - 1))
+		{
+			printf("NO");
+			return 0;
+		}
+	}
+	printf("YES");
 	return 0;
 }
