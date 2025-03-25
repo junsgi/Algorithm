@@ -1,55 +1,53 @@
 #include<stdio.h>
-#include <queue>
+#include<vector>
+#include<algorithm>
 using namespace std;
-struct compare{
-	bool operator() (pair<int, int> i, pair<int, int> j)
-	{
-		return i.second > j.second;
-	}
+struct Temp {
+    int st, ed, w;
 };
-priority_queue <pair<int, int>, vector<pair<int, int>>, compare> que;
-int n, m, ans, graph[1010][1010], cost[1010], visit[1010], MAX=0x7fffffff;
-
-
-void spanning(int node)
+int n, m, p[1001], answer;
+vector<Temp> arr;
+int cmp(Temp& a, Temp& b) { return a.w < b.w; }
+void init()
 {
-	if(visit[node]) return;
-	visit[node] = 1;
-	int nxt_node = 0, min = MAX; 
-	for(int i = 1 ; i <= n ; i++)
-	{
-		if (!visit[i] && cost[i] > graph[node][i])
-			cost[i] = graph[node][i];
-
-		if (!visit[i] && min > cost[i])
-		{
-			nxt_node = i;
-			min = cost[i];
-		}
-	}
-
-	spanning(nxt_node);
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++)
+        p[i] = i;
+    for (int i = 0; i < m; i++)
+    {
+        int a, b, c;
+        scanf("%d%d%d", &a, &b, &c);
+        arr.push_back({ a, b, c });
+    }
 }
-
+int find(int x)
+{
+    if (p[x] == x) return x;
+    return p[x] = find(p[x]);
+}
+int Union(int x, int y)
+{
+    int fx = find(x), fy = find(y);
+    int res = fx == fy;
+    if (fx < fy)
+        p[fy] = fx;
+    else if (fx > fy)
+        p[fx] = fy;
+    return res;
+}
+void solution()
+{
+    sort(arr.begin(), arr.end(), cmp);
+    for (Temp& i : arr)
+    {
+        if (Union(i.st, i.ed)) continue;
+        answer += i.w;
+    }
+    printf("%d", answer);
+}
 int main()
 {
-	fill(&graph[0][0], &graph[1009][1009], MAX);
-	fill(&cost[0], &cost[1009], MAX);
-	scanf("%d", &n);
-	scanf("%d", &m);
-	for(int i = 0 ; i < m ; i++)
-	{
-		int x, y, z;
-		scanf("%d%d%d", &x, &y, &z);
-		graph[x][y] = graph[y][x] = z;
-	}
-	spanning(1);
-
-	for(int i = 1 ; i <= n ; i++) 
-	{
-		if (cost[i] != MAX)
-			ans += cost[i];
-	}
-	printf("%d", ans);
-	return 0;
+    init();
+    solution(); // 최소 신장 트리
+    return 0;
 }
