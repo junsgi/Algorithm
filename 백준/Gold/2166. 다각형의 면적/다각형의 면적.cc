@@ -2,28 +2,19 @@
 #include<stdio.h>
 #include<algorithm>
 using namespace std;
-typedef double ll;
-
 int n;
-ll x1, y11, x2, y2, x3, y3;
-ll ans;
-ll CCW(ll a, ll b, ll c, ll d, ll e, ll f)
+double answer, x[10000], y[10000];
+double ccw(double a, double b, double c, double d, double e, double f)
 {
-	ll t1 = a * d + c * f + e * b;
-	ll t2 = c * b + e * d + a * f;
-	return (t1 - t2) / 2;
+	return (a * d + c * f + e * b) - (c * b + e * d + a * f);
 }
 int main()
 {
 	scanf("%d", &n);
-	scanf("%lf%lf%lf%lf", &x1, &y11, &x2, &y2);
-	for (int i = 0; i < n - 2; i++)
-	{
-		scanf("%lf%lf", &x3, &y3);
-		ans += CCW(x1, y11, x2, y2, x3, y3);
-		x2 = x3;
-		y2 = y3;
-	}
-	printf("%.1lf", abs(ans));
+	for (int i = 0; i < n; i++)
+		scanf("%lf%lf", &x[i], &y[i]);
+	for (int i = 2; i < n; i++)
+		answer += ccw(x[0], y[0], x[i - 1], y[i - 1], x[i], y[i]) / 2;
+	printf("%.1f", abs(answer));
 	return 0;
 }
