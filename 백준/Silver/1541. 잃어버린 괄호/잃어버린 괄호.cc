@@ -1,21 +1,23 @@
 #pragma warning(disable:4996)
-#include<stdio.h>
-char a[100];
-int temp, swi = 1, ans, plus;
+#include <stdio.h>
+char sic[100];
+int result, swi = 1, temp;
 int main()
 {
-	scanf("%s", a);
-	for (int i = 0; a[i]; i++)
+	scanf("%s", sic);
+	for (int i = 0; sic[i]; i++)
 	{
-		if (a[i] == '-' || a[i] == '+')
+		if (sic[i] == '-' || sic[i] == '+')
 		{
-			if (a[i] == '-') swi = -1;
-			ans += temp;
+			if(sic[i] == '-')
+				swi = -1;
+			result += temp;
 			temp = 0;
 		}
-		else
-			temp = temp * 10 + (a[i] - '0') * swi;
+		else if('0' <= sic[i] && sic[i] <= '9')
+			temp = (10 * temp) + (sic[i] - '0') * swi;
+
 	}
-	printf("%d", ans + temp);
+	printf("%d", result + temp);
 	return 0;
 }
