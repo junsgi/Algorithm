@@ -1,6 +1,6 @@
 def solution(A, B):
     answer = 0
-    i, j = 0, 0
+    i, j = 0, 0 
     A.sort()
     B.sort()
     while j < len(B):
