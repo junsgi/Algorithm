@@ -13,7 +13,7 @@ def Dijkstra(start, graph, n):
             if limit[tNode] < s2 + tCost: continue
             limit[tNode] = s2 + tCost
             que.append((tNode, s2 + tCost))
-    return limit
+    return limit 
 # 빠르지만 정답이 나오지 않는 코드
 # def DFS(st, value, graph, check, a, b, n):
 #     global answer
