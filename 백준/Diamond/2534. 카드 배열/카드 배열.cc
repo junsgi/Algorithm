@@ -1,116 +1,100 @@
 #pragma warning(disable:4996)
 #include<stdio.h>
-#include<algorithm>
 #include<vector>
-#include<queue>
-#define M 300001
-#define MOD 1000000007
+#define M 1'000'000'007
 using namespace std;
-vector<int> graph[2][M];
-int n, k, p, edge[2][M], visit[M], heap[M * 5], len;
-int path[M];
-long long value[M] = {1, };
-long long n1, n2, r;
+int n, k, p, c, heap[300'100], n1[300000], n2[300000], len;
+long long po[300'000], MAX, MIN;
+vector<int> g1[300'000], g2[300'000];
 void up(int idx);
 void down(int idx);
 int main()
 {
-	scanf("%d%d%d", &n, &k, &p);
+    scanf("%d%d%d", &n, &k, &p);
+    po[0] = 1;
+    for (int i = 1; i < k; i++)
+        po[i] = po[i - 1] * n % M;
 
-	// n ^ i 를 미리 구해 놓음
-	for (int i = 1; i < k; i++) value[i] = (value[i - 1] * n) % MOD;
-	for (int i = 0; i < p; i++)
-	{
-		int st, ed;
-		scanf("%d%d", &st, &ed);
-		graph[0][st].push_back(ed); edge[0][ed]++;
-		graph[1][ed].push_back(st); edge[1][st]++;
-	}
-	for (int i = 0; i < k; i++)
-	{
-		if (edge[0][i] == 0)
-		{
-			heap[++len] = i;
-			up(len);
-		}
-	}
-	int number = k;
-	while (len)
-	{
-		int node = heap[1];
-		heap[1] = heap[len--];
-		down(1);
-		n1 += ((--number) * value[node]) % MOD;
-		n1 %= MOD;
-		for (int i = 0; i < (int)graph[0][node].size(); i++)
-		{
-			int tnode = graph[0][node][i];
-			if (--edge[0][tnode] == 0)
-			{
-				heap[++len] = tnode;
-				up(len);
-			}
-		}
-	}
+    for (int i = 0; i < p; i++)
+    {
+        int a, b;
+        scanf("%d%d", &a, &b);
+        g1[b].emplace_back(a); n1[a]++;
+        g2[a].emplace_back(b); n2[b]++;
+    }
+    
+    c = n - k;
+    for (int i = 0; i < k; i++)
+    {
+        if (!n1[i])
+        {
+            heap[++len] = i;
+            up(len);
+        }
+    }
+    while (len)
+    {
+        int node = heap[1];
+        heap[1] = heap[len--]; down(1);
+        MAX += (po[node] * (c++)) % M;
+        MAX %= M;
+        for (int& tnode : g1[node])
+        {
+            if (--n1[tnode] == 0)
+            {
+                heap[++len] = tnode;
+                up(len);
+            }
+        }
+    }
 
-	// 32410
-	len = 0;
-	for (int i = 0; i < k; i++)
-	{
-		visit[i] = 0;
-		if (edge[1][i] == 0)
-		{
-			heap[++len] = i;
-			up(len);
-		}
-	}
-	number = n - k - 1;
-	while (len)
-	{
-		int node = heap[1];
-		heap[1] = heap[len--];
-		down(1);
-		n2 += ((++number) * value[node]) % MOD;
-		n2 %= MOD;
-		for (int i = 0; i < (int)graph[1][node].size(); i++)
-		{
-			int tnode = graph[1][node][i];
-			if (--edge[1][tnode] == 0)
-			{
-				heap[++len] = tnode;
-				up(len);
-			}
-		}
-	}
-	printf("%lld", ((n2  + MOD)- n1) % MOD);
-	return 0;
+    len = 0;
+    c = k;
+    for (int i = 0; i < k; i++)
+    {
+        if (!n2[i])
+        {
+            heap[++len] = i;
+            up(len);
+        }
+    }
+    while (len)
+    {
+        int node = heap[1];
+        heap[1] = heap[len--]; down(1);
+        MIN += (po[node] * (--c)) % M;
+        MIN %= M;
+
+        for (int& tnode : g2[node])
+        {
+            if (--n2[tnode] == 0)
+            {
+                heap[++len] = tnode;
+                up(len);
+            }
+        }
+    }
+    printf("%lld", ((MAX + M) - MIN) % M);
+    return 0;
 }
-void change(int x, int y)
-{
-	int tmp = heap[x];
-	heap[x] = heap[y];
-	heap[y] = tmp;
-}
+
 void up(int idx)
 {
-	if (idx / 2 <= 0) return;
-	if (heap[idx] < heap[idx / 2])
-	{
-		change(idx, idx / 2);
-		up(idx / 2);
-	}
+    if (idx / 2 <= 0) return;
+    if (heap[idx] < heap[idx / 2])
+    {
+        int tmp = heap[idx]; heap[idx] = heap[idx / 2]; heap[idx / 2] = tmp;
+        up(idx / 2);
+    }
 }
-
 void down(int idx)
 {
-	int child = idx * 2;
-	if (child > len) return;
-	if (child + 1 <= len && heap[child] > heap[child + 1])
-		child++;
-	if (heap[idx] > heap[child])
-	{
-		change(idx, child);
-		down(child);
-	}
+    int child = idx * 2;
+    if (child > len) return;
+    if (child + 1 <= len && heap[child] > heap[child + 1])child++;
+    if (heap[idx] > heap[child])
+    {
+        int tmp = heap[idx]; heap[idx] = heap[child]; heap[child] = tmp;
+        down(child);
+    }
 }
-
