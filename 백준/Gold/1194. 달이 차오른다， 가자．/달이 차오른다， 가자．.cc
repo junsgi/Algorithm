@@ -3,7 +3,7 @@
 #include<queue>
 #define M 1'000'000'000
 using namespace std;
-struct temp {
+struct temp {. 
 	int x, y, KEY;
 }t;
 int n, m, sx, sy, visit[1 << 6][60][60];
