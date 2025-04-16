@@ -1,63 +1,44 @@
 #pragma warning(disable:4996)
 #include<stdio.h>
+#include<vector>
 #include<algorithm>
+#include<math.h>
 using namespace std;
-int n, X, Y;
-struct temp {
-	double x, y, width, height;
-}rec[100];
-double x[100], y[100], ans;
-double getArea(double a, double b, double x, double y)
-{
-	return abs((x - a) * (y - b));
-}
-int check(double a, double b, double x, double y)
-{
-	for (int i = 0; i < n; i++)
-	{
-		if (rec[i].x <= a &&
-			x <= rec[i].width &&
-			rec[i].y <= b &&
-			y <= rec[i].height)
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
+int n;
+double sx[30], sy[30], ex[30], ey[30], ans;
+vector<double> x, y;
 int main()
 {
-	scanf("%d", &n);
-	for (int i = 0; i < n; i++)
-	{
-		scanf("%lf%lf%lf%lf", &rec[i].x, &rec[i].y, &rec[i].width, &rec[i].height);
-		rec[i].width += rec[i].x;
-		rec[i].height += rec[i].y;
-		x[X++] = rec[i].x;
-		x[X++] = rec[i].width;
-
-		y[Y++] = rec[i].y;
-		y[Y++] = rec[i].height;
-	}
-	sort(x, x + X);
-	sort(y, y + Y);
-	for (int i = 0; i < X - 1; i++)
-	{
-		double a = x[i];
-		double b = x[i + 1];
-		if (a == b) continue;
-		for (int j = 0; j < Y - 1; j++)
-		{
-			double c = y[j];
-			double d = y[j + 1];
-			if (c == d) continue;
-			int flag = check(a, c, b, d);
-			if (flag)
-				ans += (b - a) * (d - c);
-		}
-	}
-	if ((long long)ans == ans) printf("%lld", (long long)ans);
-	else
-		printf("%.2lf", ans);
-	return 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%lf%lf%lf%lf", &sx[i], &sy[i], &ex[i], &ey[i]);
+        ex[i] += sx[i]; ey[i] += sy[i];
+        x.emplace_back(sx[i]); x.emplace_back(ex[i]);
+        y.emplace_back(sy[i]); y.emplace_back(ey[i]);
+    }
+    sort(x.begin(), x.end());
+    sort(y.begin(), y.end());
+    for (int i = 1; i < x.size(); i++)
+    {
+        if (x[i - 1] == x[i]) continue;
+        for (int j = 1; j < y.size(); j++)
+        {
+            if (y[j - 1] == y[j]) continue;
+            int flag = 0;
+            for (int k = 0; k < n; k++)
+            {
+                if (sx[k] <= x[i - 1] && x[i] <= ex[k] && sy[k] <= y[j - 1] && y[j] <= ey[k])
+                {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag) ans += (x[i] - x[i - 1]) * (y[j] - y[j - 1]);
+        }
+    }
+    if (floor(ans) == ans) printf("%lld", (long long)floor(ans));
+    else
+        printf("%.2lf", ans);
+    return 0;
 }
