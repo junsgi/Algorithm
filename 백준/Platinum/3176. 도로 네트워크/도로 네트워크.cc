@@ -1,100 +1,99 @@
 #pragma warning(disable:4996)
-#include<stdio.h>
-#include<queue>
+// 희소배열로 최소공동조상 찾기, 비트마스킹으로 log2(high depth - low depth)만에 위치를 찾음
+#include<iostream>
 #include<vector>
-#define M 100'001
-#define MIN(x,y) (((x)>(y)) ? (y):(x))
-#define MAX(x,y) (((x)>(y)) ? (x):(y))
+#include<algorithm>
+#define M 20
 using namespace std;
-int n, a, b, cnt, m, t, res1, res2;
-int DP[18][M], Max[18][M], Min[18][M], depth[M];
-vector<pair<int, int>> graph[M];
-queue<int> que;
-void BFS()
+struct Node 
 {
-	que.push(1);
-	depth[1] = 1;
-
-	while (!que.empty())
+	int node, weight; 
+	Node(int a, int b) : node(a), weight(b) {}
+};
+int n, k, ex, ck[100'000], depth[100'000], dp[M][100'000], MIN[M][100'000], MAX[M][100'000];
+vector<Node> graph[100'000];
+void init()
+{
+	cin >> n;
+	for (int i = 1; i <= n; i *= 2) ex++;
+	for (int i = 0; i < n - 1; i++)
 	{
-		int node = que.front();
-		que.pop();
+		int a, b, c;
+		cin >> a >> b >> c; a--; b--;
+		graph[a].emplace_back(b, c);
+		graph[b].emplace_back(a, c);
+	}
+}
+void dfs(int node, int d)
+{
+	ck[node] = 1; depth[node] = d;
+	for (const Node& t : graph[node])
+	{
+		if (ck[t.node]) continue;
+		dp[0][t.node] = node;
+		MIN[0][t.node] = MAX[0][t.node] = t.weight;
+		dfs(t.node, d + 1);
+	}
+}
+void solution()
+{
+	dfs(0, 0);
+	MIN[0][0] = 0x7fffffff;
 
-		for (int i = 0; i < (int)graph[node].size(); i++)
+	// 희소 배열 만듦
+	for (int i = 1; i <= ex; i++)
+	{
+		for (int j = 0; j < n; j++)
 		{
-			int tnode = graph[node][i].first;
-			int tcost = graph[node][i].second;
-			if (depth[tnode]) continue;
-			depth[tnode] = depth[node] + 1;
-			DP[0][tnode] = node;
-			Max[0][tnode] = Min[0][tnode] = tcost;
-			que.push(tnode);
+			dp[i][j] = dp[i - 1][dp[i - 1][j]];
+			MIN[i][j] = min(MIN[i - 1][j], MIN[i - 1][dp[i - 1][j]]);
+			MAX[i][j] = max(MAX[i - 1][j], MAX[i - 1][dp[i - 1][j]]);
 		}
+	}
+	//print();
+
+	cin >> k;
+	for (int i = 0; i < k; i++)
+	{
+		int a, b, a1 = 0x7fffffff, a2 = 0;
+		cin >> a >> b; a--; b--;
+		if (depth[a] > depth[b]) 
+			swap(a, b);
+		int cnt = abs(depth[b] - depth[a]);
+		for (int bit = 0; bit <= ex; bit++)
+		{
+			if ((cnt & (1 << bit)) == 0)
+				continue;
+			a1 = min(a1, MIN[bit][b]);
+			a2 = max(a2, MAX[bit][b]);
+			b = dp[bit][b];
+		}
+
+		while (a != b) // 높이를 맞춘 후 같은 조상 바라보고있다면 false
+		{
+			if (dp[0][a] == dp[0][b])
+			{
+				a1 = min(a1, min(MIN[0][a], MIN[0][b]));
+				a2 = max(a2, max(MAX[0][a], MAX[0][b]));
+				break;
+			}
+			for (int tx = ex; tx >= 0; tx--)
+			{
+				if (dp[tx][a] == dp[tx][b]) continue;
+				a1 = min(a1, min(MIN[tx][a], MIN[tx][b]));
+				a2 = max(a2, max(MAX[tx][a], MAX[tx][b]));
+				a = dp[tx][a];
+				b = dp[tx][b];
+			}
+		}
+		cout << a1 << " " << a2 << "\n";
 	}
 }
 int main()
 {
-	fill(&Min[0][0], &Min[17][M - 1], 2'000'000);
-	scanf("%d", &n);
-	for (int i = 0; i < n - 1; i++)
-	{
-		scanf("%d%d%d", &a, &b, &cnt);
-		graph[a].push_back({ b, cnt });
-		graph[b].push_back({ a, cnt });
-	}
-	BFS();
-	cnt = 0;
-	for (int i = 1; i <= n; i *= 2) cnt++;
-
-	for (int i = 1; i <= cnt; i++)
-	{
-		for (int j = 1; j <= n; j++)
-		{
-			DP[i][j] = DP[i - 1][DP[i - 1][j]];
-			Max[i][j] = MAX(Max[i - 1][j], Max[i - 1][DP[i - 1][j]]);
-			Min[i][j] = MIN(Min[i - 1][j], Min[i - 1][DP[i - 1][j]]);
-		}
-	}
-	scanf("%d", &m);
-	for (int i = 0; i < m; i++)
-	{
-		res1 = 2'000'000;
-		res2 = 0;
-		scanf("%d%d", &a, &b);
-		if (depth[a] < depth[b])
-		{
-			t = a;
-			a = b;
-			b = t;
-		}
-		int jump = depth[a] - depth[b];
-
-		for (int i = cnt; i >= 0; i--)
-		{
-			if (jump & (1 << i))
-			{
-				res1 = MIN(res1, Min[i][a]);
-				res2 = MAX(res2, Max[i][a]);
-				a = DP[i][a];
-			}
-		}
-
-		for (int i = cnt; a != b && i >= 0; i--)
-		{
-			if (DP[i][a] != DP[i][b])
-			{
-				res1 = MIN(res1, MIN(Min[i][a], Min[i][b]));
-				res2 = MAX(res2, MAX(Max[i][a], Max[i][b]));
-				a = DP[i][a];
-				b = DP[i][b];
-			}
-		}
-		if (a != b)
-		{
-			res1 = MIN(res1, MIN(Min[0][a], Min[0][b]));
-			res2 = MAX(res2, MAX(Max[0][a], Max[0][b]));
-		}
-		printf("%d %d\n", res1, res2);
-	}
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	init();
+	solution();
 	return 0;
 }
