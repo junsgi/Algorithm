@@ -1,72 +1,57 @@
-#pragma warning(disable:4996)
-#include <stdio.h>
-#include <iostream>
-#include <string>
-#include <algorithm>
-#define M "1000000000"
+#include<iostream>
+#include<string>
+#include<algorithm>
 using namespace std;
-typedef long long ll;
-int t, n;
-string DP[101] = { M, M, "1", "7", "4", "2", "0", "8" };
-ll heap[101], len;
-void up(int idx);
-void dynamic();
-int main()
-{
-	dynamic();
-	DP[6] = "6";
-	scanf("%d", &t);
-	for (int i = 0; i < t; i++)
-	{
-		scanf("%d", &n);
-		int origin = n;
-		string tmp = "";
-		if (n % 2)
-		{
-			tmp = "7";
-			n -= 3;
-		}
-		for (int i = 0; i < n / 2; i++)
-			tmp.append("1");
-		cout << DP[origin] << " " << tmp << '\n';
-	}
-	return 0;
-}
-void dynamic()
+int n;
+string DP[101] = { "0", "0", "1", "7", "4", "2", "6", "8"};
+void solution()
 {
 	for (int i = 8; i <= 100; i++)
 	{
-		string res = M;
-		for (int j = 2; j <= i / 2; j++)
+		int left = 2, right = i - 2;
+		long long res = 8888888888888888;
+		string ans = "";
+		while (left <= right)
 		{
-			string a;
-			if (DP[j].at(0) == '0') a = "6" + DP[i - j];
-			else a = DP[j] + DP[i - j];
+			long long n1 = stoll(DP[left] + (right == 6 ? "0" : DP[right]));
+			if (n1 < res)
+			{
+				res = n1;
+				ans = DP[left] + (right == 6 ? "0" : DP[right]);
+			}
 
-			string b = DP[i - j] + DP[j];
-			if (DP[i - j].at(0) == '0') b = "6" + DP[j];
-			else b = DP[i - j] + DP[j];
-
-			heap[++len] = stoll(a);
-			up(len);
-
-			heap[++len] = stoll(b);
-			up(len);
+			long long n2 = stoll(DP[right] + (left == 6 ? "0" : DP[left]));
+			if (n2 < res)
+			{
+				res = n2;
+				ans = DP[right] + (left == 6 ? "0" : DP[left]);
+			}
+			left++; right--;
 		}
-		DP[i] = to_string(heap[1]);
-		len = 0;
-		heap[1] = 0;
+		DP[i] = ans;
 	}
 }
-void up(int idx)
+string MAX(int n)
 {
-	int child = idx / 2;
-	if (child <= 0) return;
-	if (heap[idx] < heap[child])
+	string res = (n & 1) ? "7" : "1";
+	while (3 < n)
 	{
-		ll tmp = heap[idx];
-		heap[idx] = heap[child];
-		heap[child] = tmp;
-		up(child);
+		res += "1";
+		n -= 2;
 	}
+	return res;
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	solution();
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		int t;
+		cin >> t;
+		cout << DP[t] << " " << MAX(t) << '\n';
+	}
+	return 0;
 }
