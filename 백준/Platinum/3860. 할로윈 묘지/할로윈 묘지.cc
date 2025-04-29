@@ -1,82 +1,102 @@
+// 음수 간선이 존재하므로 벨만 포드 알고리즘을 사용하여 최단거리와 사이클 판단
 #pragma warning(disable:4996)
-#include<stdio.h>
-#include<algorithm>
+#include<iostream>
 #include<vector>
-#define M 1'000'000'000
+#include<algorithm>
+#define M 987543210
 using namespace std;
-struct temp {
-	long long st, ed, cost;
-};
-int n, m, g, t, a, b, c, d, e, graph[50][50], freq[50][50];
-int dire[4][2] = { {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
-long long visit[1000];
-vector<temp> arr;
-int BellmanFord()
+typedef pair<int, int> pii;
+struct Node
 {
-	visit[1] = 0;
-	int res = 0;
-	for (int i = 0; i < n * m; i++)
-	{
-		res = 0;
-		for (int j = 0; j < (int)arr.size(); j++)
-		{
-			if (visit[arr[j].st] == M) continue;
-			if (visit[arr[j].ed] > visit[arr[j].st] + arr[j].cost)
-			{
-				res = 1;
-				visit[arr[j].ed] = visit[arr[j].st] + arr[j].cost;
-			}
-		}
-	}
-	return res;
+    int x, y, z;
+    Node(int a, int b, int c) : x(a), y(b), z(c) {}
+};
+int w, h, g, matrix[30][30], ck[900], dire[4][2] = { {-1, 0}, {1, 0}, {0, -1}, {0, 1} };
+int cost[900];
+vector<Node> arr;
+int getNode(int x, int y) { return x * w + y; }
+void make_arr()
+{
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            if (i == h - 1 && j == w - 1) break;
+            int node = getNode(i, j);
+            // 묘비거나 귀신 구멍이라면 continue, 묘비 = -1, 구멍 = 1
+            if (ck[node] != 0) continue;
+            for (const int* k : dire)
+            {
+                int tx = i + (*k), ty = j + *(k + 1);
+                if (!(0 <= tx && tx < h && 0 <= ty && ty < w)) continue;
+                int tnode = getNode(tx, ty);
+                if (ck[tnode] < 0) continue; // 묘비면 continue
+                arr.emplace_back(node, tnode, 1);
+            }
+        }
+    }
+}
+void init()
+{
+    fill(&matrix[0][0], &matrix[0][0] + w * h, 0);
+    fill(cost, cost + w * h, M);
+    fill(ck, ck + w * h, 0);
+    arr.clear();
 }
 int main()
 {
-	while (1)
-	{
-		scanf("%d%d", &n, &m);
-		if (!(n + m)) break;
-		for (int i = 0; i < 1000; i++)visit[i] = M;
-		fill(&freq[0][0], &freq[49][49], 0);
-		arr.clear();
-		int cnt = 1;
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < m; j++)
-				graph[i][j] = cnt++;
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    while (1)
+    {
+        cin >> w >> h;
+        if (w + h == 0) break;
 
-		scanf("%d", &g);
-		for (int i = 0; i < g; i++)
-		{
-			scanf("%d%d", &a, &b);
-			graph[a][b] = 0;
-		}
-		scanf("%d", &t);
-		for (int i = 0; i < t; i++)
-		{
-			scanf("%d%d%d%d%d", &a, &b, &c, &d, &e);
-			freq[a][b] = 1;
-			arr.push_back({ graph[a][b], graph[c][d], e });
-		}
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < m; j++)
-			{
-				if (freq[i][j]) continue;
-				if (graph[i][j] == n * m) continue;
-				if (!graph[i][j])continue;
-				for (int k = 0; k < 4; k++)
-				{
-					int tx = dire[k][0] + i;
-					int ty = dire[k][1] + j;
-					if (!(0 <= tx && tx < n)) continue;
-					if (!(0 <= ty && ty < m)) continue;
-					if (!graph[tx][ty]) continue;
-					arr.push_back({ graph[i][j], graph[tx][ty], 1 });
-				}
-			}
-		}
-		if (BellmanFord()) printf("Never\n");
-		else visit[n * m] == M ? printf("Impossible\n") : printf("%lld\n", visit[n * m]);
-	}
-	return 0;
+        // init
+        init();
+
+        cin >> g;
+        for (int i = 0; i < g; i++)
+        {
+            int a, b;
+            cin >> a >> b;
+            ck[getNode(b, a)] = -1;
+        }
+
+        cin >> g;
+        for (int i = 0; i < g; i++)
+        {
+            int a, b, c, d, e;
+            cin >> a >> b >> c >> d >> e;
+            arr.emplace_back(getNode(b, a), getNode(d, c), e);
+            ck[getNode(b, a)] = 1;
+        }
+
+        make_arr();
+
+        // bellman ford Algorithm
+        cost[0] = 0;
+        int hit = 0;
+        for (int i = 0; i <= w * h; i++)
+        {
+            hit = 0;
+            for (const struct Node& ref : arr)
+            {
+                if (cost[ref.x] == M) continue;
+                if (cost[ref.x] + ref.z < cost[ref.y])
+                {
+                    hit = 1;
+                    cost[ref.y] = cost[ref.x] + ref.z;
+                }
+            }
+        }
+        if (hit == 1)
+            cout << "Never\n";
+        else if (cost[getNode(h - 1, w - 1)] == M)
+            cout << "Impossible\n";
+        else
+            cout << cost[getNode(h - 1, w - 1)] << '\n';
+    }
+
+    return 0;
 }
