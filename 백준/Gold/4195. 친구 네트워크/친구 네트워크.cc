@@ -1,89 +1,65 @@
-#pragma warning(disable:4996)
-#include<stdio.h>
-#include<string.h>
-#include<vector>
-#include <cstring>
-#define N 205837
+#include<iostream>
+#include<algorithm>
+#include<string>
+#include<map>
 using namespace std;
-vector<pair<char*, int>> HashTable[N]; // key, flag
-int check[N];
-int value[N];
-int t, f, cnt = 1, tmp;
-char f1[30], f2[30];
-
-// 해시 값 반환
-int getKey(char* name)
-{
-	unsigned long long result = 0, r = 1;
-	for (int i = 0; name[i]; i++)
-	{
-		int value = name[i] - 64;
-		result = (result + value * r) % N;
-		r = r * 31 % N;
-	}
-	return (int)(result % N);
-}
-
-// 이름의 아이디 반환 (Union find에 활용)
-int getId(int key, char* name)
-{
-	for (int i = 0; i < (int)HashTable[key].size(); i++)
-	{
-		if (!strcmp(HashTable[key][i].first, name))
-			return HashTable[key][i].second;
-	}
-
-	// 새로운 메모리를 할당하고 name의 내용을 복사 후 temp에 대입
-	char* temp = strdup(name);
-	HashTable[key].push_back({temp, cnt++});
-	return HashTable[key][(int)HashTable[key].size() - 1].second;
-}
-
+int n, m, p[200'000], cnt[200'000];
+map<string, int> table;
 int find(int node)
 {
-	if (check[node] == node) return node;
-	return check[node] = find(check[node]);
+	if (p[node] == node) return node;
+	return p[node] = find(p[node]);
 }
-void Union(int x, int y)
+int Union(int x, int y)
 {
-	int fx = find(x);
-	int fy = find(y);
-
-	if (fx != fy) 
+	int fx = find(x), fy = find(y);
+	if (fx == fy) return cnt[fx];
+	if (fx < fy)
 	{
-		if (fx > fy)
-			check[fy] = fx;
-		else
-			check[fx] = fy;
-		value[fx] = value[fy] = value[fx] + value[fy]; // 서로 두 친구의 최상위 부모 노드에 친구 수 갱신
+		p[fy] = fx;
+		cnt[fx] += cnt[fy];
+		cnt[fy] = 0;
+		return cnt[fx];
 	}
-	else value[fx] = value[fy] = value[fx];
+	else
+	{
+		p[fx] = fy;
+		cnt[fy] += cnt[fx];
+		cnt[fx] = 0;
+		return cnt[fy];
+	}
 }
 int main()
 {
-	scanf("%d", &t);
-	for (int i = 1; i <= t; i++)
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+
+	cin >> n;
+	for(int i = 0 ; i < n ; i++)
 	{
-		scanf("%d", &f);
-		fill(value, value + N, 1);
-		cnt = 1;
-		for (int j = 1; j < N; j++) check[j] = j;
-		for (int j = 0; j < f; j++)
+		cin >> m;
+		int no = 0, x, y;
+		string n1, n2;
+		
+		// init
+		table = map<string, int>();
+		for(int j = 0 ; j < 200000 ; j++)
 		{
-			scanf("%s", f1);
-			scanf("%s", f2);
-			int f1Key = getKey(f1);
-			int f1_id = getId(f1Key, f1);
-
-			int f2Key = getKey(f2);
-			int f2_id = getId(f2Key, f2);
-
-			Union(f1_id, f2_id);
-			printf("%d\n", value[find(f1_id)]);
+			p[j] = j;
+			cnt[j] = 1;
 		}
-		for (int j = 0; j < N; j++)
-			HashTable[j].clear();
-	}
 
+		//solution
+		for(int j = 0 ; j < m ; j++)
+		{
+			cin >> n1 >> n2;
+			if (table.find(n1) == table.end())
+				table.insert({n1, no++});
+			if (table.find(n2) == table.end())
+				table.insert({n2, no++});
+			x = table[n1]; y = table[n2];
+			cout << Union(x, y) << '\n';
+		}					
+	}
 	return 0;
 }
