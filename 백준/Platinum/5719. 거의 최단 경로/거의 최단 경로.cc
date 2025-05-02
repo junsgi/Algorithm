@@ -1,4 +1,3 @@
-#pragma warning(disable:4996)
 // 거의 최단 경로란 최단 경로에 포함되지 않는 도로로만 이루어진 경로 중 가장 짧은 것
 #include<iostream>
 #include<vector>
@@ -8,8 +7,6 @@
 using namespace std;
 int n, m, s, e, cost[500], visit[500], matrix[500][500];
 queue<int> que;
-
-
 void bfs()
 {
 	que = queue<int>();
@@ -17,7 +14,6 @@ void bfs()
 	while (!que.empty())
 	{
 		int node = que.front(); que.pop();
-		visit[node] = 1;
 		for (int i = 0; i < n; i++)
 		{
 			if (i == node || cost[node] != cost[i] + matrix[i][node]) continue; // 비용을 확인하여 최단거리만 탐색한다.
