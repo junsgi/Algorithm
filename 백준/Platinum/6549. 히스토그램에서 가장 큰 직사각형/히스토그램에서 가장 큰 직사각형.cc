@@ -1,61 +1,57 @@
 #pragma warning(disable:4996)
-#include <stdio.h>
-#include <algorithm>
-#define M 2'000'000'000
+#include<iostream>
+#include<algorithm>
+#define M 5'000'000'000ll
 using namespace std;
 typedef long long ll;
-typedef pair<int, int> pii;
-int n, ex, arr[100'001];
-ll ans;
-pii seg[1 << 18];
+ll n, ex, m;
+pair<int, ll> seg[(1 << 18) + 1];
 
-pii insert(int left, int right, int idx);
-pii query(int left, int right, int idx, int x, int y);
-void process(int left, int right);
+pair<int, ll> query(ll left, ll right, ll idx, ll st, ll ed)
+{
+	if (right < st || ed < left) return { 0, M };
+	if (st <= left && right <= ed) return seg[idx];
+	ll mid = (left + right) / 2;
+	pair<int, ll> l = query(left, mid, idx * 2, st, ed);
+	pair<int, ll> r = query(mid + 1, right, idx * 2 + 1, st, ed);
+	if (l.second < r.second) return l;
+	else return r;
+}
+
+pair<int, ll> insert(ll left, ll right, ll idx, int target)
+{
+	if (target < left || right < target) return seg[idx];
+	if (left == right && left == target) return seg[idx] = { target, m };
+	ll mid = (left + right) / 2;
+	pair<int, ll> l = insert(left, mid, idx * 2, target);
+	pair<int, ll> r = insert(mid + 1, right, idx * 2 + 1, target);
+	if (l.second < r.second) seg[idx] = l;
+	else seg[idx] = r;
+	return seg[idx];
+}
+
+ll pro(ll left, ll right)
+{
+	if (left > right) return 0;
+	pair<int, ll> value = query(1, ex, 1, left, right);
+	if (left == right) return value.second;
+	return max(value.second * (right - left + 1), max(pro(left, value.first - 1), pro(value.first + 1, right)));
+}
 int main()
 {
 	while (1)
 	{
-		scanf("%d", &n);
+		cin >> n;
 		if (!n) break;
-		ans = 0;
-		for (ex = 1; ex <= n; ex *= 2);
-		for (int i = 1; i <= ex; i++) seg[i].first = seg[i].second = M;
-		for (int i = 1; i <= n; i++)
-			scanf("%d", &arr[i]);
-		insert(1, n, 1);
-		process(1, n);
-		printf("%lld\n", ans);
+		for (ex = 1; ex < n; ex *= 2);
+		for (int i = 1; i < ex * 2 + 1; i++) { seg[i].first = 0; seg[i].second = M; }
+		for (int i = 0; i < n; i++)
+		{
+			cin >> m;
+			insert(1, ex, 1, i + 1);
+		}
+		cout << pro(1, n) << '\n';
+
 	}
 	return 0;
-}
-
-pii insert(int left, int right, int idx)
-{
-	if (left == right) return seg[idx] = {arr[left], left};
-	int mid = (left + right) / 2;
-	pii a = insert(left, mid, idx * 2);
-	pii b = insert(mid + 1, right, idx * 2 + 1);
-	if (a.first < b.first) seg[idx] = a;
-	else seg[idx] = b;
-	return seg[idx];
-}
-pii query(int left, int right, int idx, int x, int y)
-{
-	if (y < left || right < x) return { M, -1 };
-	if (x <= left && right <= y) return seg[idx];
-	int mid = (left + right) / 2;
-	pii a = query(left, mid, idx * 2, x, y);
-	pii b = query(mid + 1, right, idx * 2 + 1, x, y);
-	if (a.first < b.first) return a;
-	else return b;
-}
-
-void process(int left, int right)
-{
-	if (left > right) return;
-	pii MIN = query(1, n, 1, left, right);
-	ans = max(ans, (ll)(right - left + 1) * MIN.first);
-	process(left, MIN.second - 1);
-	process(MIN.second + 1, right);
 }
