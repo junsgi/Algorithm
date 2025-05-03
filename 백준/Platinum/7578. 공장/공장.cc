@@ -1,45 +1,41 @@
 #pragma warning(disable:4996)
-#include<stdio.h>
+#include<iostream>
 #include<algorithm>
 #include<vector>
 using namespace std;
-struct temp {
-	int st, ed;
-};
-int n, t, check[1'000'001], cnt, seg[1 << 20];
+int n, ex, m, seg[1 << 21], ck[1'000'001];
 long long ans;
-int insert(int left, int right, int idx, int value)
+int query(int left, int right, int idx, int st, int ed)
 {
-	if (value < left || right < value) return seg[idx];
-	if (left == right)
-		return seg[idx] = 1;
+	if (ed < left || right < st) return 0;
+	if (st <= left && right <= ed) return seg[idx];
 	int mid = (left + right) / 2;
-	return seg[idx] = insert(left, mid, idx * 2, value) + insert(mid + 1, right, idx * 2 + 1, value);
+	return query(left, mid, idx * 2, st, ed) + query(mid + 1, right, idx * 2 + 1, st, ed);
 
 }
-int query(int left, int right, int idx, int start, int end)
+int insert(int left, int right, int idx, int target)
 {
-	if (end < left || right < start) return 0;
-	if (start <= left && right <= end)
-		return seg[idx];
+	if (target < left || right < target) return seg[idx];
+	if (left == right && target == left) return seg[idx] = 1;
 	int mid = (left + right) / 2;
-	return query(left, mid, idx * 2, start, end) + query(mid + 1, right, idx * 2 + 1, start, end);
+	return seg[idx] = insert(left, mid, idx * 2, target) + insert(mid + 1, right, idx * 2 + 1, target);
 }
 int main()
 {
-	scanf("%d", &n);
-	for (cnt = 1; cnt <= n; cnt *= 2);
-	for (int i = 1; i <= n; i++)
+	cin >> n;
+	for (ex = 1; ex < n; ex *= 2);
+	for (int i = 0; i < n; i++)
 	{
-		scanf("%d", &t);
-		check[t] = i;
+		cin >> m;
+		ck[m] = i + 1;
 	}
-	for (int i = 1; i <= n; i++)
+
+	for (int i = 0; i < n; i++)
 	{
-		scanf("%d", &t);
-		ans += query(1, cnt, 1, check[t], cnt);
-		insert(1, cnt, 1, check[t]);
+		cin >> m;
+		ans += query(1, ex, 1, ck[m], ex);
+		insert(1, ex, 1, ck[m]);
 	}
-	printf("%lld", ans);
+	cout << ans;
 	return 0;
 }
