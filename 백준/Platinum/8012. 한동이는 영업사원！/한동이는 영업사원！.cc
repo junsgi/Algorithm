@@ -1,90 +1,78 @@
+// 공통조상찾기 문제
 #pragma warning(disable:4996)
-#include<stdio.h>
+#include<iostream>
+#include<algorithm>
 #include<vector>
-#define M 30'001
-#define MAX(x,y) (((x)>(y)) ? (x):(y))
-#define MIN(x,y) (((x)>(y)) ? (y):(x))
+#include<queue>
 using namespace std;
-int n, m, t, st, ed, depth[M], visit[17][M], ans, que[M], DP[17][M];
-int cnt;
-vector<int> graph[M], arr;
-void BFS()
+int n, m, ex, a, b, ans, node, dp[16][30'000], depth[30000], visit[30000], power[16];
+vector<int> graph[30'000];
+void dfs(int x, int d)
 {
-	st = ed = -1;
-	que[++ed] = 1;
-	visit[0][1] = 1;
-	while (st != ed)
+	visit[x] = 1;
+	depth[x] = d;
+	for (const int tnode : graph[x])
 	{
-		int node = que[++st];
-		for (int i = 0; i < (int)graph[node].size(); i++)
-		{
-			int tnode = graph[node][i];
-			if (visit[0][tnode])continue;
-			visit[0][tnode] = 1;
-			depth[tnode] = depth[node] + 1;
-			DP[0][tnode] = node;
-			que[++ed] = tnode;
-		}
+		if (visit[tnode]) continue;
+		dp[0][tnode] = x;
+		dfs(tnode, d + 1);
 	}
 }
-
 int main()
 {
-	scanf("%d", &n);
+	cin >> n;
+	power[0] = 1;
+	for (int i = 1; i < n; i *= 2) ex++;
 	for (int i = 0; i < n - 1; i++)
 	{
-		scanf("%d%d", &st, &ed);
-		graph[st].push_back(ed);
-		graph[ed].push_back(st);
+		cin >> a >> b;
+		a--; b--;
+		graph[a].emplace_back(b);
+		graph[b].emplace_back(a);
 	}
-	scanf("%d", &m);
-	for (int i = 0; i < m; i++)
+	dfs(0, 0);
+	for (int i = 1; i <= ex; i++)
+		for (int j = 0; j < n; j++)
+			dp[i][j] = dp[i - 1][dp[i - 1][j]];
+	cin >> n;
+	node = 0;
+	for (int i = 0; i < n; i++)
 	{
-		scanf("%d", &st);
-		arr.push_back(st);
-	}
-
-	BFS();
-	for (int i = 1; i < n; i *= 2) cnt++;
-	visit[0][1] = 0;
-	for (int i = 1; i <= cnt; i++)
-	{
-		for (int j = 1; j <= n; j++)
+		cin >> m; m--;
+		a = node;
+		b = m;
+		if (depth[a] > depth[b])
 		{
-			DP[i][j] = DP[i - 1][DP[i - 1][j]];
-			visit[i][j] = visit[i - 1][j] + visit[i - 1][DP[i - 1][j]];
+			a = m;
+			b = node;
 		}
-	}
-	for (int i = 1 ; i < m ; i++)
-	{
-		int n1 = arr[i - 1];
-		int n2 = arr[i];
-		if (depth[n1] < depth[n2]) { t = n1; n1 = n2; n2 = t; }
-
-		int jump = depth[n1] - depth[n2];
-		// n1 점프
-		for (int j = cnt; j >= 0; j--)
+		int diff = depth[b] - depth[a];
+		for (int j = ex; j >= 0; j--)
 		{
-			if (jump & (1 << j))
+			if (diff & (1 << j))
 			{
-				ans += visit[j][n1];
-				n1 = DP[j][n1];
+				b = dp[j][b];
+				ans += (1 << j);
 			}
 		}
 
-		for (int j = cnt; j >= 0; j--)
+		while (a != b)
 		{
-			if (DP[j][n1] != DP[j][n2])
+			if (dp[0][a] == dp[0][b])
 			{
-				ans += visit[j][n1];
-				ans += visit[j][n2];
-				n1 = DP[j][n1];
-				n2 = DP[j][n2];
+				ans += 2;
+				break;
+			}
+			for (int i = ex; i >= 0; i--)
+			{
+				if (dp[i][a] == dp[i][b])continue;
+				a = dp[i][a];
+				b = dp[i][b];
+				ans += (1 << i) * 2;
 			}
 		}
-		if (n1 != n2)
-			ans += visit[0][n1] + visit[0][n2];
+		node = m;
 	}
-	printf("%d", ans);
+	cout << ans;
 	return 0;
 }
