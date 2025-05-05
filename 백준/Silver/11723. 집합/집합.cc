@@ -1,28 +1,47 @@
 #pragma warning(disable:4996)
 #include<stdio.h>
 #include<string.h>
-int n, m, S;
+#include<set>
+using namespace std;
+int n, m;
 char com[10];
+set<int> s;
 int main()
 {
 	scanf("%d", &n);
-	for (int i = 0; i < n; i++)
+	while (n--)
 	{
-		scanf("%s", &com);
-		scanf("%d", &m);
-		int num = m - 1;
+		scanf("%s", com);
 		if (!strcmp(com, "add"))
-			S |= (1 << num);
-		else if (!strcmp(com, "remove"))
-			S &= ~(1 << num);
-		else if (!strcmp(com, "check"))
-			printf("%d\n", S & (1 << num) ? 1 : 0);
-		else if (!strcmp(com, "toggle"))
-			S = S & (1 << num) ? S & ~(1 << num) : S | (1 << num);
+		{
+			scanf("%d", &m);
+			s.insert(m);
+		}
 		else if (!strcmp(com, "all"))
-			S = (1 << 20) - 1;
+		{
+			for (int i = 1; i <= 20; i++)
+				s.insert(i);
+		}
+		else if (!strcmp(com, "remove"))
+		{
+			scanf("%d", &m);
+			s.erase(m);
+		}
+		else if (!strcmp(com, "check"))
+		{
+			scanf("%d", &m);
+			printf("%d\n", s.find(m) != s.end());
+		}
+		else if (!strcmp(com, "toggle"))
+		{
+			scanf("%d", &m);
+			if (s.find(m) == s.end())
+				s.insert(m);
+			else
+				s.erase(m);
+		}
 		else
-			S = 0;
+			s.clear();
 	}
 	return 0;
 }
