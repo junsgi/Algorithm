@@ -1,14 +1,16 @@
 #pragma warning(disable:4996)
 #include<stdio.h>
+#include<vector>
 #include<algorithm>
-#define M 500'000
 using namespace std;
-struct temp
+struct Node
 {
-	int st, ed, idx;
-}arr[M * 2];
-int n, m, t, check[M];
-int cmp(temp x, temp y) { return x.st < y.st || x.st == y.st && x.ed > y.ed; }
+	int x, y, node;
+	Node(int a, int b, int c) : x(a), y(b), node(c) {};
+};
+int cmp(const Node& x, const Node& y) { return x.x < y.x || (x.x == y.x && x.y > y.y); }
+int n, m, MAX, ans[500000];
+vector<Node> arr;
 int main()
 {
 	scanf("%d%d", &n, &m);
@@ -16,26 +18,21 @@ int main()
 	{
 		int a, b;
 		scanf("%d%d", &a, &b);
-		arr[i].st = a; arr[i].ed = b; arr[i].idx = i;
-		if (a > b)
-			arr[i].ed = n + b;
-		else // 노선을 하나 더 추가한다.
+		if (a <= b)
 		{
-			arr[t + m].st = n + a;
-			arr[t + m].ed = n + b;
-			arr[t + m].idx = i;
-			t++;
+			arr.emplace_back(a, b, i);
+			arr.emplace_back(a + n, b + n, i);
 		}
+		else
+			arr.emplace_back(a, b + n, i);
 	}
-	sort(arr, arr + m + t, cmp);
-	int end = 0;
-	for (int i = 0; i < m + t; i++)
+	sort(arr.begin(), arr.end(), cmp);
+	for (int i = 0; i < arr.size(); i++)
 	{
-		// 가장 긴 노선을 제외한 모든 노선 제외
-		if (arr[i].ed <= end) check[arr[i].idx] = 1;
-		else end = arr[i].ed;
+		if (arr[i].y <= MAX) ans[arr[i].node] = 1; // y는 내림차순, 최댓값보다 작거나 같다면 해당 노선은 포함시킴
+		else MAX = arr[i].y;
 	}
 	for (int i = 0; i < m; i++)
-		if (!check[i]) printf("%d ", i + 1);
+		if (!ans[i]) printf("%d ", i + 1);
 	return 0;
 }
