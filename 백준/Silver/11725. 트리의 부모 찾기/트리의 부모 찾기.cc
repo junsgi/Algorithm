@@ -1,33 +1,30 @@
 #pragma warning(disable:4996)
 #include<stdio.h>
 #include<vector>
-#define M 100'001
 using namespace std;
-int n, st, ed, pa[M];
-vector<int> graph[M];
-void DFS(int node)
+int n, a, b, p[100001];
+vector<int> graph[100001];
+void dfs(int node)
 {
-	for (int i = 0; i < (int)graph[node].size(); i++)
-	{
-		int tnode = graph[node][i];
-		if (pa[tnode]) continue;
-		pa[tnode] = node;
-		DFS(tnode);
-	}
+    for (const int& tnode : graph[node])
+    {
+        if (p[tnode]) continue;
+        p[tnode] = node;
+        dfs(tnode);
+    }
 }
 int main()
 {
-	scanf("%d", &n);
-	for (int i = 0; i < n - 1; i++)
-	{
-		scanf("%d%d", &st, &ed);
-		graph[st].push_back(ed);
-		graph[ed].push_back(st);
-	}
-	pa[1] = 1;
-	DFS(1);
-	for (int i = 2; i <= n; i++)
-		printf("%d\n", pa[i]);
-
-	return 0;
+    scanf("%d", &n);
+    for (int i = 1; i < n; i++)
+    {
+        scanf("%d%d", &a, &b);
+        graph[a].push_back(b);
+        graph[b].push_back(a);
+    }
+    p[1] = 1;
+    dfs(1);
+    for (int i = 2; i <= n; i++)
+        printf("%d\n", p[i]);
+    return 0;
 }
