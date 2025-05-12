@@ -1,33 +1,32 @@
 #pragma warning(disable:4996)
-#include <stdio.h>
-#include <algorithm>
+#include<stdio.h>
+#include<algorithm>
+#include<queue>
 using namespace std;
-typedef pair<int, int> pii;
-int n, visit[1001], ans;
-pii arr[1001];
+int n, arr[1001], ans;
+priority_queue<pair<int, int>, vector<pair<int, int>>> heap;
 int main()
 {
-	scanf("%d", &n);
-	for (int i = 0; i < n; i++) scanf("%d%d", &arr[i].first, &arr[i].second);
-
-	for (int i = n; i > 0; i--)
-	{
-		int value = -1, idx = 0;
-		for (int j = 0; j < n; j++)
-		{
-			if (visit[j]) continue;
-			if (i <= arr[j].first && value < arr[j].second)
-			{
-				value = arr[j].second;
-				idx = j;
-			}
-		}
-		if (value > 0)
-		{
-			ans += value;
-			visit[idx] = 1;
-		}
-	}
-	printf("%d", ans);
-	return 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        int a, b;
+        scanf("%d%d", &a, &b);
+        heap.push({ b, a });
+    }
+    while (!heap.empty())
+    {
+        pair<int, int> element = heap.top(); heap.pop();
+        for (int i = element.second; i >= 1; i--)
+        {
+            if (arr[i] == 0)
+            {
+                arr[i] = 1;
+                ans += element.first;
+                break;
+            }
+        }
+    }
+    printf("%d", ans);
+    return 0;
 }
