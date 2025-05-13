@@ -2,62 +2,58 @@
 #include<stdio.h>
 #include<algorithm>
 using namespace std;
-int n, m, visit[1001], gender[1001], st, ed, c, ans[1001], check[1001], cnt;
-char g;
-struct temp {
-	int st, ed, cost;
-}arr[10001];
-int cmp(temp x, temp y) {
-	return x.cost < y.cost;
-}
-int find(int x)
+struct Node { int x, y, z; }arr[10000];
+int n, m, g[1001], p[1001], c[1001];
+int cmp(const Node& x, const Node& y)
 {
-	if (visit[x] == x) return x;
-	return visit[x] = find(visit[x]);
+    return x.z < y.z;
 }
-void Union(int x, int y, int value)
+int find(int node)
 {
-	int fx = find(x);
-	int fy = find(y);
-	if (fx == fy) return;
-
-	if (fx < fy)
-	{
-		visit[fy] = fx;
-		ans[fx] = value + ans[fx] + ans[fy];
-	}
-	else
-	{
-		visit[fx] = fy;
-		ans[fy] = value + ans[fy] + ans[fx];
-	}
+    if (p[node] == node) return node;
+    return p[node] = find(p[node]);
+}
+void Union(int x, int y, int z)
+{
+    int fx = find(x), fy = find(y);
+    if (fx == fy) return;
+    if (fx < fy)
+    {
+        p[fy] = fx;
+        c[fx] += c[fy] + z;
+    }
+    else
+    {
+        p[fx] = fy;
+        c[fy] += c[fx] + z;
+    }
 }
 int main()
 {
-	scanf("%d%d", &n, &m);
-	for (int i = 1; i <= n; i++) 
-	{
-		visit[i] = i;
-		scanf(" %c", &g);
-		if (g == 'M')
-			gender[i] = 1;
-		else
-			gender[i] = -1;
-	}
-	for (int i = 0; i < m; i++)
-		scanf("%d%d%d", &arr[i].st, &arr[i].ed, &arr[i].cost);
-	sort(arr, arr + m, cmp);
-	for (int i = 0; i < m; i++)
-	{
-		if (gender[arr[i].st] != gender[arr[i].ed])
-		{
-			Union(arr[i].st, arr[i].ed, arr[i].cost);
-			if (check[arr[i].st]++ == 0)cnt++;
-			if (check[arr[i].ed]++ == 0)cnt++;
-		}
-	}
-	if (cnt != n)
-		printf("-1");
-	else printf("%d", ans[1]);
-	return 0;
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++)
+    {
+        char a;
+        scanf(" %c", &a);
+        if (a == 'M') g[i] = 1;
+        p[i] = i;
+    }
+    for (int i = 0; i < m; i++)
+        scanf("%d%d%d", &arr[i].x, &arr[i].y, &arr[i].z);
+    sort(arr, arr + m, cmp);
+    for (int i = 0; i < m; i++)
+    {
+        if (g[arr[i].x] == g[arr[i].y]) continue;
+        Union(arr[i].x, arr[i].y, arr[i].z);
+    }
+    for (int i = 2; i <= n; i++)
+    {
+        if (find(i - 1) != find(i))
+        {
+            printf("-1");
+            return 0;
+        }
+    }
+    printf("%d", c[find(1)]);
+    return 0;
 }
