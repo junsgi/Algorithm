@@ -3,52 +3,55 @@
 #include<algorithm>
 #include<vector>
 using namespace std;
-struct temp {
-	int num, value, sweeping;
-};
-int n, m, a, b, c, p[100'001];
-vector<temp> arr;
-int cmp(temp x, temp y)
+int n, m, s, c, p[100001];
+struct Node { int x, y, z; };
+vector<Node> arr;
+int cmp(const Node& x, const Node& y)
 {
-	return x.value < y.value || (x.value == y.value && x.sweeping > y.sweeping);
+    return x.x < y.x || x.x == y.x && x.y > y.y;
 }
 int find(int node)
 {
-	if (p[node] == node) return node;
-	return p[node] = find(p[node]);
+    if (node == p[node]) return node;
+    return p[node] = find(p[node]);
 }
 void Union(int x, int y)
 {
-	int fx = find(x);
-	int fy = find(y);
-	if (fx == fy) return;
-	if (fx < fy) p[fy] = fx;
-	else p[fx] = fy;
+    int fx = find(x), fy = find(y);
+    if (fx == fy) return;
+    if (fx < fy)
+        p[fy] = fx;
+    else
+        p[fx] = fy;
 }
 int main()
 {
-	scanf("%d%d", &n, &m);
-	for (int i = 0; i <= n; i++) p[i] = i;
-	for (int i = 1; i <= n; i++)
-	{
-		scanf("%d%d%d", &a, &b, &c);
-		arr.push_back({ i, a, 1 });
-		arr.push_back({ i, b, -1 });
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++)
+    {
+        int a, b, c;
+        scanf("%d%d%d", &a, &b, &c);
+        arr.push_back({ a, 1, i });
+        arr.push_back({ b, -1, i });
+        p[i] = i;
+    }
 
-	}
-	sort(arr.begin(), arr.end(), cmp);
-	int sum = 1;
-	for (int i = 1; i < (int)arr.size(); i++)
-	{
-		sum += arr[i].sweeping;
-		if (sum > 1)
-			Union(arr[i].num, arr[i - 1].num);
-	}
-	for (int i = 0; i < m; i++)
-	{
-		scanf("%d%d", &a, &b);
-		if (find(a) != find(b)) printf("0\n");
-		else printf("1\n");
-	}
-	return 0;
+    sort(arr.begin(), arr.end(), cmp);
+    s = 1;
+    for (int i = 1; i < arr.size(); i++)
+    {
+        if (arr[i].y == 1 && s > 0)
+            Union(arr[i - 1].z, arr[i].z);
+        s += arr[i].y;
+    }
+    for (int i = 0; i < m;i++)
+    {
+        int a, b;
+        scanf("%d%d", &a, &b);
+        if (find(a) == find(b))
+            printf("1\n");
+        else
+            printf("0\n");
+    }
+    return 0;
 }
