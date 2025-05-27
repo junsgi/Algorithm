@@ -19,8 +19,8 @@ int main()
                 c += (x <= ox[w] && ox[w] <= mx) && (y <= oy[w] && oy[w] <= my);
             if (cnt < c)
             {
-                ax = min(ox[i], n - k); // x가 n - k 보다 크다면 범위를 벗어나므로 n - k
-                ay = max(oy[j], k); // y가 k보다 낮다면 범위를 벗어나므로 k
+                ax = min(ox[i], n - k);
+                ay = max(oy[j], k);
                 cnt = c;
             }
         }
