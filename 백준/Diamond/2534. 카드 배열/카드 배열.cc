@@ -13,7 +13,7 @@ int main()
     scanf("%d%d%d", &n, &k, &p);
     po[0] = 1;
     for (int i = 1; i < k; i++)
-        po[i] = po[i - 1] * n % M;
+        po[i] = po[i - 1] * n % M; 
 
     for (int i = 0; i < p; i++)
     {
