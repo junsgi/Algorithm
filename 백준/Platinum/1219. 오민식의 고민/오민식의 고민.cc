@@ -20,31 +20,22 @@ int main()
 	}
 	for (int i = 0; i < n; i++) scanf("%lld", &cost[i]);
 	visit[st] = cost[st];
-	int status = 0;
+	int hit = 0;
 	for (int i = 0; i < n + 101; i++)
 	{
 		status = 0;
 		for (int j = 0; j < (int)arr.size(); j++)
 		{
 			if (visit[arr[j].st] == M) continue;
-			else if (visit[arr[j].st] == -M)
-				visit[arr[j].ed] = -M;
+			else if (visit[arr[j].st] == -M) visit[arr[j].ed] = -M;
 			else if (visit[arr[j].ed] < visit[arr[j].st] + cost[arr[j].ed] + arr[j].value)
 			{
 				visit[arr[j].ed] = visit[arr[j].st] + cost[arr[j].ed] + arr[j].value;
 				// 마지막에 영향을 주는 지점의 값이 바뀐다면
-				if (i >= n - 1)
-				{
+				if (i > n - 1)
 					visit[arr[j].ed] = -M;
-					if (arr[j].ed == ed) // 도착지점도 양수 사이클이라면 종료
-					{
-						status = 1;
-						break;
-					}
-				}
 			}
 		}
-		if (status) break;
 	}
 	if (visit[ed] == -M) printf("Gee");
 	else if (visit[ed] == M) printf("gg");
