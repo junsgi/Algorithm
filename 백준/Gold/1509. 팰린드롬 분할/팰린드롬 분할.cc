@@ -31,10 +31,16 @@ int main()
 {
     scanf("%s", n + 1);
     for (len = 1; n[len]; len++);
-    for (int term = 0; term < len; term++)
-        for (int idx = 1; idx < len - term; idx++)
-            if (p(idx, idx + term))
-                dp[idx][idx + term] = 1;
+    for (int i = 1; i < len; i++) dp[i][i] = 1;
+    for (int term = 2; term <= len; term++)
+    {
+        for (int st = 1; st <= len - term; st++)
+        {
+            int ed = st + term - 1;
+            if (n[st] == n[ed] && (st + 1 >= ed - 1 || dp[st + 1][ed - 1]))
+                dp[st][ed] = 1;
+        }
+    }
     for (int end = 1; end < len; end++)
     {
         ans[end] = 3000;
