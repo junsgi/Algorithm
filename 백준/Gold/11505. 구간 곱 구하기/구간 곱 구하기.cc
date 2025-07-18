@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include <iostream>
+using namespace std;
 constexpr int mod = 1e9+7;
 using ll = long long;
 int n, m, k, x, a, b;
@@ -27,21 +28,23 @@ ll query(int st, ll ed)
 }
 int main()
 {
-    scanf("%d%d%d", &n, &m, &k);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr); cout.tie(nullptr);
+    cin >> n >> m >> k;
     for (x = 1; x < n; x *= 2);
     for (int i = 1; i < x; i++) seg[i] = 1;
     for (int i = 1; i <= n; i++)
     {
-        scanf("%lld", &c);
+        cin >> c;
         update(i, c);
     }
     for (int i = 0; i < m + k; i++)
     {
-        scanf("%d%d%lld", &a, &b, &c);
+        cin >> a >> b >> c;
         if (a & 1)
             update(b, c);
         else
-            printf("%lld\n", query(b, c));
+            cout << query(b, c) << '\n';
     }
     return 0;
 }
