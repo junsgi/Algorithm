@@ -17,13 +17,13 @@ void mul(int(&x)[5][5], int(&y)[5][5])
 int main()
 {
     scanf("%d%lld", &n, &b);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) 
     {
         for (int j = 0; j < n; j++)
             scanf("%d", &matrix[i][j]);
         ans[i][i] = 1;
     }
-    while (b > 0)
+    while (b > 0) // 행렬 곱셈
     {
         if (b & 1) mul(ans, matrix);
         mul(matrix, matrix);
