@@ -29,6 +29,8 @@ vector<int> kmp_search(const string& T, const string& P) {
 }
 
 int main() {
+    cin.tie(nullptr); cout.tie(nullptr);
+    ios_base::sync_with_stdio(false);
     string T, P;
     getline(cin, T);
     getline(cin, P);
