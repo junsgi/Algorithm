@@ -15,16 +15,10 @@ int main()
 	while (q--)
 	{
 		cin >> n >> x; 
-		s = 0;
-		while (n)
-		{
-			if (n & 1) // 홀수일 때 점프, 결국 어느 숫자든 n은 1로 결정되기 때문에 x에는 최종값이 대입됨
-				x = dp[s][x];
-			++s;
-			n >>= 1;
-		}
+		for (int i = 0; i < 20; ++i)
+			if (n & (1 << i))
+				x = dp[i][x];
 		cout << x << '\n';
-
 	}
 	return 0;
 }
